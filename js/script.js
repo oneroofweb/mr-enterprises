@@ -212,8 +212,22 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // ----------------------------------------------------
-    // 3. BRAND TABS FILTER
+    // 3. BRAND TABS FILTER & CATEGORY VISIBILITY CONTROLLER
     // ----------------------------------------------------
+    const updateCategoryBlockVisibility = () => {
+        const categoryBlocks = document.querySelectorAll('[data-category-block]');
+        categoryBlocks.forEach(block => {
+            const cards = block.querySelectorAll('[data-product-brand]');
+            const hasVisible = Array.from(cards).some(card => card.style.display !== 'none');
+            if (hasVisible) {
+                block.classList.remove('hidden');
+                block.classList.add('is-revealed');
+            } else {
+                block.classList.add('hidden');
+            }
+        });
+    };
+
     const brandTabs = () => {
         const tabBtns = document.querySelectorAll('[data-brand-tab]');
         const productItems = document.querySelectorAll('[data-product-brand]');
@@ -241,6 +255,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         item.style.display = 'none';
                     }
                 });
+
+                // Update category blocks visibility accordingly
+                updateCategoryBlockVisibility();
             });
         });
     };
@@ -258,6 +275,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const query = e.target.value.trim().toLowerCase();
                 if (!query) {
                     productItems.forEach(item => item.style.display = 'block');
+                    updateCategoryBlockVisibility();
                     return;
                 }
 
@@ -272,6 +290,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         item.style.display = 'none';
                     }
                 });
+
+                // Update category blocks visibility accordingly
+                updateCategoryBlockVisibility();
             });
         });
     };
@@ -300,220 +321,29 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // ----------------------------------------------------
-    // 6. QUICK VIEW MODAL WITH WHATSAPP PRE-FILL
+    // 6 & 7 & 8. MULTI-PRODUCT CART & 3-STEP CHECKOUT SYSTEM
+    // (1. Add Product -> 2. Confirm Order / Address -> 3. Payment Mode Combined UPI)
     // ----------------------------------------------------
-    const quickViewModal = () => {
-        const modal = document.getElementById('quick-view-modal');
-        if (!modal) return;
-
-        const closeBtn = modal.querySelector('[data-modal-close]');
-        const backdrop = modal.querySelector('[data-modal-backdrop]');
-        const modalImg = modal.querySelector('[data-modal-img]');
-        const modalTitle = modal.querySelector('[data-modal-title]');
-        const modalBrand = modal.querySelector('[data-modal-brand]');
-        const modalCategory = modal.querySelector('[data-modal-category]');
-        const modalPrice = modal.querySelector('[data-modal-price]');
-        const modalMrp = modal.querySelector('[data-modal-mrp]');
-        const modalSpecs = modal.querySelector('[data-modal-specs]');
-        const modalQty = modal.querySelector('[data-modal-qty]');
-        const qtyMinus = modal.querySelector('[data-qty-minus]');
-        const qtyPlus = modal.querySelector('[data-qty-plus]');
-        const modalWhatsAppBtn = modal.querySelector('[data-modal-wa-btn]');
-
-        let currentQty = 1;
-        let currentItemName = '';
-        let currentItemPrice = '';
-
-        const updateWhatsAppLink = () => {
-            if (!modalWhatsAppBtn) return;
-            const phone = "919648505055";
-            const text = `Hello MR Enterprises, I want to order:\n\n*Product:* ${currentItemName}\n*Price:* ${currentItemPrice}\n*Quantity:* ${currentQty} units\n\nPlease confirm availability and delivery to Lucknow.`;
-            modalWhatsAppBtn.href = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
-        };
-
-        const openModal = (card) => {
-            currentItemName = card.getAttribute('data-product-title') || 'Product';
-            currentItemPrice = card.getAttribute('data-product-price') || '₹0';
-            const brand = card.getAttribute('data-product-brand') || '';
-            const category = card.getAttribute('data-product-category') || '';
-            const mrp = card.getAttribute('data-product-mrp') || '';
-            const img = card.querySelector('img')?.src || '';
-            const specs = card.getAttribute('data-product-specs') || '100% Genuine Manufacturer Covered Product';
-
-            currentQty = 1;
-            if (modalQty) modalQty.textContent = currentQty;
-
-            if (modalImg) modalImg.src = img;
-            if (modalTitle) modalTitle.textContent = currentItemName;
-            if (modalBrand) modalBrand.textContent = brand.toUpperCase();
-            if (modalCategory) modalCategory.textContent = category;
-            if (modalPrice) modalPrice.textContent = currentItemPrice;
-            if (modalMrp) modalMrp.textContent = mrp;
-            if (modalSpecs) modalSpecs.textContent = specs;
-
-            updateWhatsAppLink();
-
-            modal.classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
-        };
-
-        const closeModal = () => {
-            modal.classList.add('hidden');
-            document.body.style.overflow = '';
-        };
-
-        document.querySelectorAll('[data-quick-view-btn]').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.preventDefault();
-                const card = btn.closest('[data-product-card]');
-                if (card) openModal(card);
-            });
-        });
-
-        if (modalWhatsAppBtn) {
-            modalWhatsAppBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                closeModal();
-                if (typeof window.openUpiPaymentModal === 'function') {
-                    window.openUpiPaymentModal({
-                        title: currentItemName,
-                        price: currentItemPrice,
-                        qty: currentQty,
-                        img: modalImg ? modalImg.src : ''
-                    });
-                }
-            });
-        }
-
-        if (closeBtn) closeBtn.addEventListener('click', closeModal);
-        if (backdrop) backdrop.addEventListener('click', closeModal);
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
-                closeModal();
-            }
-        });
-
-        if (qtyPlus) {
-            qtyPlus.addEventListener('click', () => {
-                currentQty++;
-                if (modalQty) modalQty.textContent = currentQty;
-                updateWhatsAppLink();
-            });
-        }
-
-        if (qtyMinus) {
-            qtyMinus.addEventListener('click', () => {
-                if (currentQty > 1) {
-                    currentQty--;
-                    if (modalQty) modalQty.textContent = currentQty;
-                    updateWhatsAppLink();
-                }
-            });
-        }
-    };
-
-    // ----------------------------------------------------
-    // 7. CARD INLINE QUANTITY SELECTOR & INSTANT PAYMENT MODAL
-    // ----------------------------------------------------
-    const cardQuantityController = () => {
-        document.querySelectorAll('[data-product-card]').forEach(card => {
-            const minusBtn = card.querySelector('[data-card-qty-minus]');
-            const plusBtn = card.querySelector('[data-card-qty-plus]');
-            const input = card.querySelector('[data-card-qty-input]');
-            const orderBtn = card.querySelector('[data-card-order-btn]');
-            if (!minusBtn || !plusBtn || !input || !orderBtn) return;
-
-            const title = card.getAttribute('data-product-title') || 'Product';
-            const price = card.getAttribute('data-product-price') || '';
-
-            const updateOrderLink = (qty) => {
-                const phone = "919648505055";
-                const text = `Hello MR Enterprises,\n\n*New Order Details:*\n• *Product:* ${title}\n• *Quantity:* ${qty}\n• *Price:* ${price}\n\nPlease confirm availability & delivery.`;
-                orderBtn.href = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
-            };
-
-            let qty = parseInt(input.value, 10) || 1;
-
-            plusBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                qty++;
-                input.value = qty;
-                updateOrderLink(qty);
-            });
-
-            minusBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                if (qty > 1) {
-                    qty--;
-                    input.value = qty;
-                    updateOrderLink(qty);
-                }
-            });
-
-            // Intercept Order Now click to open UPI Payment Modal
-            orderBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                const currentQty = parseInt(input.value, 10) || 1;
-                const img = card.querySelector('img')?.src || '';
-                if (typeof window.openUpiPaymentModal === 'function') {
-                    window.openUpiPaymentModal({
-                        title,
-                        price,
-                        qty: currentQty,
-                        img
-                    });
-                }
-            });
-        });
-    };
-
-    // ----------------------------------------------------
-    // 8. DIRECT UPI PAYMENT & ORDER CONFIRMATION MODAL
-    // ----------------------------------------------------
-    const upiPaymentModalController = () => {
-        const modal = document.getElementById('upi-payment-modal');
-        if (!modal) return;
-
-        const closeBtn = modal.querySelector('[data-payment-close]');
-        const backdrop = modal.querySelector('[data-payment-backdrop]');
-        const payImg = modal.querySelector('[data-pay-img]');
-        const payTitle = modal.querySelector('[data-pay-title]');
-        const payRate = modal.querySelector('[data-pay-rate]');
-        const payQty = modal.querySelector('[data-pay-qty]');
-        const payTotal = modal.querySelector('[data-pay-total]');
-        const payQr = modal.querySelector('[data-pay-qr]');
-        const payUpiId = modal.querySelector('[data-pay-upi-id]');
-        const copyBtn = modal.querySelector('[data-copy-upi-btn]');
-        const upiAppLink = modal.querySelector('[data-pay-upi-app-link]');
-        const submitBtn = modal.querySelector('[data-submit-order-btn]');
-        const step1 = document.getElementById('pay-step-1');
-        const step2 = document.getElementById('pay-step-2');
-        const step1NextBtn = document.getElementById('pay-step1-next-btn');
-        const backToStep1Btn = modal.querySelector('[data-back-to-step1-btn]');
-        const modalTitle = modal.querySelector('[data-pay-modal-title]');
-        const modalSubtitle = modal.querySelector('[data-pay-modal-subtitle]');
-        const modalBody = modal.querySelector('.overflow-y-auto');
-
-        const nameInput = document.getElementById('pay-customer-name');
-        const phoneInput = document.getElementById('pay-customer-phone');
-        const addressInput = document.getElementById('pay-customer-address');
-        const cityInput = document.getElementById('pay-customer-city');
-        const stateInput = document.getElementById('pay-customer-state');
-        const pincodeInput = document.getElementById('pay-customer-pincode');
-        const utrInput = document.getElementById('pay-customer-utr');
-        const validationError = document.getElementById('pay-validation-error');
-
+    const orderCartAndCheckoutController = () => {
         const STORE_UPI_ID = "9648505055@upi";
         const STORE_PHONE = "919648505055";
         const STORE_NAME = "MR Enterprises";
 
-        let currentOrder = {
-            title: '',
-            price: '',
-            unitRateNum: 0,
-            qty: 1,
-            totalNum: 0,
-            formattedTotal: '₹0.00'
+        // Cart state stored in memory (and synced with sessionStorage)
+        let cart = [];
+        try {
+            const saved = sessionStorage.getItem('mr_cart_items');
+            if (saved) {
+                cart = JSON.parse(saved);
+            }
+        } catch (e) {
+            cart = [];
+        }
+
+        const saveCart = () => {
+            try {
+                sessionStorage.setItem('mr_cart_items', JSON.stringify(cart));
+            } catch (e) {}
         };
 
         const parsePrice = (priceStr) => {
@@ -530,6 +360,99 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         };
 
+        // DOM elements
+        const checkoutModal = document.getElementById('upi-payment-modal');
+        const floatingCartBar = document.getElementById('floating-cart-bar');
+        const modalBackdrop = checkoutModal?.querySelector('[data-payment-backdrop]');
+        const modalCloseBtns = checkoutModal?.querySelectorAll('[data-payment-close]');
+        const modalTitle = checkoutModal?.querySelector('[data-checkout-modal-title]');
+        const modalSubtitle = checkoutModal?.querySelector('[data-checkout-modal-subtitle]');
+        const modalBody = checkoutModal?.querySelector('.overflow-y-auto');
+
+        // Stepper elements
+        const wizardStep1 = document.getElementById('checkout-step-1');
+        const wizardStep2 = document.getElementById('checkout-step-2');
+        const wizardStep3 = document.getElementById('checkout-step-3');
+        const footerStep1 = document.getElementById('footer-actions-step-1');
+        const footerStep2 = document.getElementById('footer-actions-step-2');
+        const footerStep3 = document.getElementById('footer-actions-step-3');
+
+        const step1NextBtn = document.getElementById('pay-step1-next-btn');
+        const step2BackBtn = document.getElementById('pay-step2-back-btn');
+        const step2NextBtn = document.getElementById('pay-step2-next-btn');
+        const step3BackBtn = document.getElementById('pay-step3-back-btn');
+        const submitOrderBtn = checkoutModal?.querySelector('[data-submit-order-btn]');
+
+        // Form fields
+        const nameInput = document.getElementById('pay-customer-name');
+        const phoneInput = document.getElementById('pay-customer-phone');
+        const addressInput = document.getElementById('pay-customer-address');
+        const cityInput = document.getElementById('pay-customer-city');
+        const stateInput = document.getElementById('pay-customer-state');
+        const pincodeInput = document.getElementById('pay-customer-pincode');
+        const utrInput = document.getElementById('pay-customer-utr');
+        const validationError = document.getElementById('pay-validation-error');
+
+        // Step 3 Payment elements
+        const payCombinedTotal = checkoutModal?.querySelector('[data-pay-combined-total]');
+        const payQr = checkoutModal?.querySelector('[data-pay-qr]');
+        const copyUpiBtn = checkoutModal?.querySelector('[data-copy-upi-btn]');
+        const payUpiAppLink = checkoutModal?.querySelector('[data-pay-upi-app-link]');
+
+        // Toast container
+        let toastEl = document.getElementById('cart-toast-notification');
+        if (!toastEl) {
+            toastEl = document.createElement('div');
+            toastEl.id = 'cart-toast-notification';
+            toastEl.className = 'fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-3 bg-mr-blue text-white text-xs font-bold rounded-xl shadow-2xl transition-all duration-300 transform translate-y-[-20px] opacity-0 pointer-events-none border border-blue-400/30';
+            document.body.appendChild(toastEl);
+        }
+
+        let toastTimeout = null;
+        const showToast = (message) => {
+            if (!toastEl) return;
+            if (toastTimeout) clearTimeout(toastTimeout);
+            toastEl.innerHTML = `
+                <div class="flex items-center gap-2">
+                    <i class="bi bi-check-circle-fill text-green-400 text-sm"></i>
+                    <span>${message}</span>
+                </div>
+                <button type="button" data-toast-cart-btn class="ml-2.5 px-2.5 py-1 bg-yellow-400 hover:bg-yellow-300 active:bg-yellow-500 text-mr-blue rounded-lg font-black text-[11px] transition cursor-pointer shadow-xs whitespace-nowrap">
+                    Go to Cart ➔
+                </button>
+            `;
+            const toastBtn = toastEl.querySelector('[data-toast-cart-btn]');
+            if (toastBtn) {
+                toastBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    openCheckoutModal(1);
+                });
+            }
+            toastEl.classList.remove('translate-y-[-20px]', 'opacity-0', 'pointer-events-none');
+            toastEl.classList.add('translate-y-0', 'opacity-100', 'pointer-events-auto');
+            toastTimeout = setTimeout(() => {
+                toastEl.classList.add('translate-y-[-20px]', 'opacity-0', 'pointer-events-none');
+                toastEl.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
+            }, 3200);
+        };
+
+        const getSummary = () => {
+            let count = cart.length;
+            let totalUnits = 0;
+            let grandTotal = 0;
+            cart.forEach(item => {
+                totalUnits += item.qty;
+                grandTotal += (item.unitRate * item.qty);
+            });
+            return {
+                count,
+                totalUnits,
+                grandTotal,
+                formattedTotal: formatINR(grandTotal)
+            };
+        };
+
         const showError = (msg) => {
             if (validationError) {
                 validationError.textContent = msg;
@@ -544,116 +467,414 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
 
-        const setStep = (stepNumber) => {
-            if (stepNumber === 1) {
-                if (step1) step1.classList.remove('hidden');
-                if (step2) step2.classList.add('hidden');
-                if (step1NextBtn) step1NextBtn.classList.remove('hidden');
-                if (submitBtn) submitBtn.classList.add('hidden');
-                if (modalTitle) modalTitle.textContent = 'Complete Order & Pay';
-                if (modalSubtitle) modalSubtitle.textContent = 'Step 1 of 2: Direct Store UPI Payment';
-                clearError();
-            } else {
-                if (step1) step1.classList.add('hidden');
-                if (step2) step2.classList.remove('hidden');
-                if (step1NextBtn) step1NextBtn.classList.add('hidden');
-                if (submitBtn) submitBtn.classList.remove('hidden');
-                if (modalTitle) modalTitle.textContent = 'Delivery & Order Confirmation';
-                if (modalSubtitle) modalSubtitle.textContent = 'Step 2 of 2: Address & Confirmation';
-                clearError();
-                setTimeout(() => {
-                    nameInput?.focus();
-                }, 120);
+        // Render Cart UI everywhere across the page
+        const renderCartUI = () => {
+            const summary = getSummary();
+            saveCart();
+
+            // 1. Header Cart Badge & Total
+            document.querySelectorAll('[data-cart-badge-count]').forEach(el => {
+                el.textContent = summary.count;
+            });
+            document.querySelectorAll('[data-cart-header-total]').forEach(el => {
+                el.textContent = summary.formattedTotal;
+            });
+
+            // 2. Floating Bottom Cart Bar
+            if (floatingCartBar) {
+                if (summary.count > 0) {
+                    floatingCartBar.classList.remove('translate-y-full', 'opacity-0', 'pointer-events-none');
+                    floatingCartBar.classList.add('translate-y-0', 'opacity-100', 'pointer-events-auto');
+                    const countEl = floatingCartBar.querySelector('[data-floating-cart-count]');
+                    const textEl = floatingCartBar.querySelector('[data-floating-cart-items-text]');
+                    const totalEl = floatingCartBar.querySelector('[data-floating-cart-total]');
+                    if (countEl) countEl.textContent = summary.count;
+                    if (textEl) textEl.textContent = `${summary.count} Product${summary.count > 1 ? 's' : ''} (${summary.totalUnits} Units)`;
+                    if (totalEl) totalEl.textContent = summary.formattedTotal;
+                } else {
+                    floatingCartBar.classList.add('translate-y-full', 'opacity-0', 'pointer-events-none');
+                    floatingCartBar.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
+                }
             }
-            if (modalBody) modalBody.scrollTop = 0;
-        };
 
-        const closeModal = () => {
-            modal.classList.add('hidden');
-            document.body.style.overflow = '';
-            setStep(1);
-            clearError();
-        };
+            // 3. Step 1: Selected Products Container
+            const itemsContainer = document.getElementById('cart-items-container');
+            const emptyState = document.getElementById('cart-empty-state');
+            const summaryBox = document.getElementById('cart-summary-box');
 
-        window.openUpiPaymentModal = ({ title, price, qty, img }) => {
-            const unitRate = parsePrice(price);
-            const quantity = parseInt(qty, 10) || 1;
-            const total = unitRate * quantity;
-            const formattedTotal = formatINR(total);
+            if (itemsContainer) {
+                if (summary.count === 0) {
+                    itemsContainer.innerHTML = '';
+                    if (emptyState) emptyState.classList.remove('hidden');
+                    if (summaryBox) summaryBox.classList.add('hidden');
+                    if (step1NextBtn) {
+                        step1NextBtn.disabled = true;
+                        step1NextBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                    }
+                } else {
+                    if (emptyState) emptyState.classList.add('hidden');
+                    if (summaryBox) summaryBox.classList.remove('hidden');
+                    if (step1NextBtn) {
+                        step1NextBtn.disabled = false;
+                        step1NextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    }
 
-            currentOrder = {
-                title: title || 'Electrical Product',
-                price: price || formatINR(unitRate),
-                unitRateNum: unitRate,
-                qty: quantity,
-                totalNum: total,
-                formattedTotal: formattedTotal
-            };
+                    let itemsHtml = '';
+                    cart.forEach((item, index) => {
+                        const itemSubtotal = item.unitRate * item.qty;
+                        itemsHtml += `
+                        <div class="flex items-center gap-2.5 sm:gap-3 p-2.5 bg-gray-50 hover:bg-gray-100/70 rounded-xl border border-gray-200 transition">
+                            <div class="w-12 h-12 bg-white rounded-lg border border-gray-200 p-1 flex items-center justify-center flex-none overflow-hidden">
+                                <img src="${item.img || 'assets/images/category-placeholder.jpg'}" alt="${item.title}" class="max-w-full max-h-full object-contain" />
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <span class="text-[9px] font-black uppercase text-blue-700 tracking-wider">${item.brand || 'GENUINE'}</span>
+                                <h4 class="font-bold text-xs sm:text-sm text-gray-900 truncate leading-snug">${item.title}</h4>
+                                <div class="text-[11px] text-gray-500 mt-0.5">Rate: <strong class="text-gray-800">${formatINR(item.unitRate)}</strong></div>
+                            </div>
+                            <div class="flex items-center border border-gray-300 rounded-lg overflow-hidden bg-white flex-none h-7 sm:h-8">
+                                <button type="button" data-cart-item-minus="${index}" aria-label="Decrease quantity" class="w-6 sm:w-7 h-full flex items-center justify-center text-gray-600 hover:bg-gray-100 active:bg-gray-200 font-bold text-xs select-none cursor-pointer">−</button>
+                                <span class="w-6 sm:w-7 text-center text-xs font-bold text-gray-900 select-none">${item.qty}</span>
+                                <button type="button" data-cart-item-plus="${index}" aria-label="Increase quantity" class="w-6 sm:w-7 h-full flex items-center justify-center text-gray-600 hover:bg-gray-100 active:bg-gray-200 font-bold text-xs select-none cursor-pointer">+</button>
+                            </div>
+                            <div class="text-right flex-none w-16 sm:w-20">
+                                <div class="text-xs sm:text-sm font-black text-mr-red">${formatINR(itemSubtotal)}</div>
+                                <button type="button" data-cart-item-remove="${index}" class="text-[10px] sm:text-[11px] text-red-500 hover:text-red-700 font-semibold underline cursor-pointer mt-0.5">Remove</button>
+                            </div>
+                        </div>
+                        `;
+                    });
+                    itemsContainer.innerHTML = itemsHtml;
 
-            if (payImg && img) payImg.src = img;
-            if (payTitle) payTitle.textContent = currentOrder.title;
-            if (payRate) payRate.textContent = currentOrder.price;
-            if (payQty) payQty.textContent = currentOrder.qty;
-            if (payTotal) payTotal.textContent = formattedTotal;
+                    // Bind item controls
+                    itemsContainer.querySelectorAll('[data-cart-item-plus]').forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            const idx = parseInt(btn.getAttribute('data-cart-item-plus'), 10);
+                            if (cart[idx]) {
+                                cart[idx].qty++;
+                                renderCartUI();
+                            }
+                        });
+                    });
 
-            // Generate NPCI standard UPI payment deep link
-            // upi://pay?pa=...&pn=...&am=...&cu=INR&tn=...
-            const cleanTitle = currentOrder.title.replace(/[^a-zA-Z0-9 ]/g, ' ').trim().slice(0, 20);
-            const amountParam = total > 0 ? total.toFixed(2) : '0.00';
-            const upiUri = `upi://pay?pa=${STORE_UPI_ID}&pn=${encodeURIComponent(STORE_NAME)}&am=${amountParam}&cu=INR&tn=${encodeURIComponent('Order ' + cleanTitle)}`;
+                    itemsContainer.querySelectorAll('[data-cart-item-minus]').forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            const idx = parseInt(btn.getAttribute('data-cart-item-minus'), 10);
+                            if (cart[idx]) {
+                                if (cart[idx].qty > 1) {
+                                    cart[idx].qty--;
+                                } else {
+                                    cart.splice(idx, 1);
+                                }
+                                renderCartUI();
+                            }
+                        });
+                    });
 
-            // High-resolution Dynamic QR Code via QRServer API
+                    itemsContainer.querySelectorAll('[data-cart-item-remove]').forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            const idx = parseInt(btn.getAttribute('data-cart-item-remove'), 10);
+                            if (cart[idx]) {
+                                const title = cart[idx].title;
+                                cart.splice(idx, 1);
+                                renderCartUI();
+                                showToast(`Removed ${title} from order.`);
+                            }
+                        });
+                    });
+                }
+            }
+
+            // Step 1 count & totals
+            document.querySelectorAll('[data-cart-summary-count]').forEach(el => el.textContent = summary.count);
+            document.querySelectorAll('[data-cart-summary-units]').forEach(el => el.textContent = `${summary.totalUnits} units`);
+            document.querySelectorAll('[data-cart-summary-subtotal]').forEach(el => el.textContent = summary.formattedTotal);
+            document.querySelectorAll('[data-cart-summary-grandtotal]').forEach(el => el.textContent = summary.formattedTotal);
+
+            // Step 2 previews
+            document.querySelectorAll('[data-step2-item-count]').forEach(el => el.textContent = summary.count);
+            document.querySelectorAll('[data-step2-total-pill]').forEach(el => el.textContent = summary.formattedTotal);
+
+            // Step 3 combined total & QR
+            if (payCombinedTotal) payCombinedTotal.textContent = summary.formattedTotal;
+
+            const amountParam = summary.grandTotal > 0 ? summary.grandTotal.toFixed(2) : '0.00';
+            const upiNote = encodeURIComponent(`Order ${summary.count} Products MR Enterprises`);
+            const upiUri = `upi://pay?pa=${STORE_UPI_ID}&pn=${encodeURIComponent(STORE_NAME)}&am=${amountParam}&cu=INR&tn=${upiNote}`;
+
             if (payQr) {
-                payQr.src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(upiUri)}`;
+                payQr.src = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(upiUri)}`;
+            }
+            if (payUpiAppLink) {
+                payUpiAppLink.href = upiUri;
             }
 
-            // Direct Mobile 1-Tap UPI launch link (GPay, PhonePe, Paytm, BHIM)
-            if (upiAppLink) {
-                upiAppLink.href = upiUri;
+            // 4. Synchronize Product Cards on the page with active cart items
+            document.querySelectorAll('[data-product-card]').forEach(card => {
+                const cardTitle = (card.getAttribute('data-product-title') || '').trim().toLowerCase();
+                const inCartItem = cart.find(i => i.title.trim().toLowerCase() === cardTitle);
+                const addBtn = card.querySelector('[data-card-add-btn]');
+                let cartBadge = card.querySelector('[data-card-in-cart-badge]');
+
+                if (inCartItem && inCartItem.qty > 0) {
+                    // Update Button State to "Go to Cart ➔"
+                    if (addBtn) {
+                        addBtn.innerHTML = `<i class="bi bi-bag-check-fill text-xs text-white"></i> <span>Go to Cart ➔</span>`;
+                        addBtn.classList.remove('bg-mr-blue', 'hover:bg-blue-900', 'active:bg-blue-950');
+                        addBtn.classList.add('bg-green-600', 'hover:bg-green-700', 'active:bg-green-800');
+                    }
+
+                    // Card border highlight
+                    card.classList.add('ring-2', 'ring-green-500/70', 'border-green-300');
+
+                    // Floating In-Cart Badge on Image
+                    if (!cartBadge) {
+                        const imgBox = card.querySelector('.aspect-\\[4\\/3\\], [class*="aspect-"]');
+                        if (imgBox) {
+                            cartBadge = document.createElement('span');
+                            cartBadge.setAttribute('data-card-in-cart-badge', '');
+                            cartBadge.className = 'absolute bottom-1.5 right-1.5 bg-green-600 text-white text-[9px] sm:text-[10px] font-black px-1.5 py-0.5 rounded shadow-sm flex items-center gap-1 z-10';
+                            imgBox.appendChild(cartBadge);
+                        }
+                    }
+                    if (cartBadge) {
+                        cartBadge.innerHTML = `<i class="bi bi-check-circle-fill text-[9px]"></i> In Cart: ${inCartItem.qty}`;
+                        cartBadge.classList.remove('hidden');
+                    }
+                } else {
+                    // Reset Button State to "Add"
+                    if (addBtn) {
+                        addBtn.innerHTML = `<i class="bi bi-cart-plus text-xs sm:text-sm"></i> <span>Add</span>`;
+                        addBtn.classList.remove('bg-green-600', 'hover:bg-green-700', 'active:bg-green-800');
+                        addBtn.classList.add('bg-mr-blue', 'hover:bg-blue-900', 'active:bg-blue-950');
+                    }
+
+                    // Remove card border highlight
+                    card.classList.remove('ring-2', 'ring-green-500/70', 'border-green-300');
+
+                    // Hide In-Cart Badge
+                    if (cartBadge) {
+                        cartBadge.classList.add('hidden');
+                    }
+                }
+            });
+        };
+
+        // Add to cart helper
+        const addToCart = (product, qty = 1) => {
+            const quantity = parseInt(qty, 10) || 1;
+            const existingIndex = cart.findIndex(i => i.title.trim().toLowerCase() === product.title.trim().toLowerCase());
+            if (existingIndex > -1) {
+                cart[existingIndex].qty += quantity;
+            } else {
+                cart.push({
+                    title: product.title,
+                    priceStr: product.priceStr,
+                    unitRate: parsePrice(product.priceStr),
+                    qty: quantity,
+                    img: product.img || '',
+                    brand: product.brand || '',
+                    category: product.category || ''
+                });
+            }
+            renderCartUI();
+            showToast(`Added ${quantity}x ${product.title} to order!`);
+        };
+
+        // Wizard step switcher
+        let currentStep = 1;
+        const setWizardStep = (step) => {
+            currentStep = step;
+            const summary = getSummary();
+
+            // Toggle step bodies
+            if (wizardStep1) wizardStep1.classList.toggle('hidden', step !== 1);
+            if (wizardStep2) wizardStep2.classList.toggle('hidden', step !== 2);
+            if (wizardStep3) wizardStep3.classList.toggle('hidden', step !== 3);
+
+            // Toggle step footers
+            if (footerStep1) footerStep1.classList.toggle('hidden', step !== 1);
+            if (footerStep2) footerStep2.classList.toggle('hidden', step !== 2);
+            if (footerStep3) footerStep3.classList.toggle('hidden', step !== 3);
+
+            // Update title & subtitle
+            if (modalTitle && modalSubtitle) {
+                if (step === 1) {
+                    modalTitle.textContent = 'Confirm & Place Order';
+                    modalSubtitle.textContent = `Step 1 of 3: Selected Products (${summary.count} items)`;
+                } else if (step === 2) {
+                    modalTitle.textContent = 'Delivery Address & Contact';
+                    modalSubtitle.textContent = 'Step 2 of 3: Enter your Lucknow delivery address';
+                } else if (step === 3) {
+                    modalTitle.textContent = 'Single Combined UPI Transfer';
+                    modalSubtitle.textContent = `Step 3 of 3: Pay ${summary.formattedTotal} for all products`;
+                }
             }
 
-            // Clear inputs on each fresh open
-            if (nameInput) nameInput.value = '';
-            if (phoneInput) phoneInput.value = '';
-            if (addressInput) addressInput.value = '';
-            if (cityInput) cityInput.value = '';
-            if (stateInput) stateInput.value = '';
-            if (pincodeInput) pincodeInput.value = '';
+            // Update step indicators
+            [1, 2, 3].forEach(num => {
+                const navBtn = checkoutModal?.querySelector(`[data-wizard-nav="${num}"]`);
+                const indicator = checkoutModal?.querySelector(`[data-step-indicator="${num}"]`);
+                if (!navBtn || !indicator) return;
 
-            if (utrInput) utrInput.value = '';
+                if (num === step) {
+                    navBtn.className = 'flex items-center gap-1.5 transition font-black text-mr-blue cursor-pointer';
+                    indicator.className = 'w-5 h-5 rounded-full bg-mr-blue text-white flex items-center justify-center text-[10px] font-bold shadow-xs';
+                    indicator.textContent = num;
+                } else if (num < step) {
+                    navBtn.className = 'flex items-center gap-1.5 transition font-bold text-green-700 cursor-pointer';
+                    indicator.className = 'w-5 h-5 rounded-full bg-green-600 text-white flex items-center justify-center text-[10px] font-bold';
+                    indicator.innerHTML = '<i class="bi bi-check text-xs"></i>';
+                } else {
+                    navBtn.className = 'flex items-center gap-1.5 transition text-gray-400 hover:text-gray-600 cursor-pointer';
+                    indicator.className = 'w-5 h-5 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center text-[10px] font-bold';
+                    indicator.textContent = num;
+                }
+            });
+
             clearError();
-            setStep(1);
+            if (modalBody) modalBody.scrollTop = 0;
 
-            modal.classList.remove('hidden');
+            if (step === 2) {
+                setTimeout(() => nameInput?.focus(), 150);
+            }
+        };
+
+        const openCheckoutModal = (step = 1) => {
+            if (!checkoutModal) return;
+            renderCartUI();
+            const summary = getSummary();
+            if (summary.count === 0) {
+                setWizardStep(1);
+            } else {
+                setWizardStep(step);
+            }
+            checkoutModal.classList.remove('hidden');
             document.body.style.overflow = 'hidden';
         };
 
+        const closeCheckoutModal = () => {
+            if (!checkoutModal) return;
+            checkoutModal.classList.add('hidden');
+            document.body.style.overflow = '';
+            setWizardStep(1);
+            clearError();
+        };
+
+        // Navigation Stepper Bar clicks
+        checkoutModal?.querySelectorAll('[data-wizard-nav]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetStep = parseInt(btn.getAttribute('data-wizard-nav'), 10);
+                const summary = getSummary();
+                if (targetStep === 1) {
+                    setWizardStep(1);
+                } else if (targetStep === 2) {
+                    if (summary.count === 0) {
+                        showError('Kripya pehle store se products add karein.');
+                        return;
+                    }
+                    setWizardStep(2);
+                } else if (targetStep === 3) {
+                    if (summary.count === 0) {
+                        showError('Kripya pehle store se products add karein.');
+                        return;
+                    }
+                    if (validateAddress()) {
+                        setWizardStep(3);
+                    }
+                }
+            });
+        });
+
+        // Step 1 -> Step 2
         if (step1NextBtn) {
             step1NextBtn.addEventListener('click', () => {
-                setStep(2);
+                const summary = getSummary();
+                if (summary.count === 0) {
+                    showToast('⚠️ Please select at least 1 product.');
+                    return;
+                }
+                setWizardStep(2);
             });
         }
 
-        if (backToStep1Btn) {
-            backToStep1Btn.addEventListener('click', () => {
-                setStep(1);
+        // Step 2 -> Step 1
+        if (step2BackBtn) {
+            step2BackBtn.addEventListener('click', () => {
+                setWizardStep(1);
             });
         }
 
-        if (closeBtn) closeBtn.addEventListener('click', closeModal);
-        if (backdrop) backdrop.addEventListener('click', closeModal);
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) closeModal();
-        });
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
-                closeModal();
+        // Validate Address Form
+        const validateAddress = () => {
+            const name = nameInput ? nameInput.value.trim() : '';
+            const phone = phoneInput ? phoneInput.value.trim() : '';
+            const address = addressInput ? addressInput.value.trim() : '';
+            const city = cityInput ? cityInput.value.trim() : '';
+            const state = stateInput ? stateInput.value.trim() : '';
+            const pincode = pincodeInput ? pincodeInput.value.trim() : '';
+
+            if (!name) {
+                showError('⚠️ Kripya apna Poora Naam (Customer Name) darj karein.');
+                nameInput?.focus();
+                return false;
             }
-        });
 
-        // 1-Click Copy Store UPI ID
-        if (copyBtn) {
-            copyBtn.addEventListener('click', async () => {
+            const cleanPhone = phone.replace(/[^0-9]/g, '');
+            if (cleanPhone.length < 10) {
+                showError('⚠️ Kripya sahi 10-digit Mobile Number darj karein.');
+                phoneInput?.focus();
+                return false;
+            }
+
+            if (!address) {
+                showError('⚠️ Kripya Address Line (House/Shop No., Street, Landmark) darj karein.');
+                addressInput?.focus();
+                return false;
+            }
+
+            if (!city) {
+                showError('⚠️ Kripya City / District darj karein.');
+                cityInput?.focus();
+                return false;
+            }
+
+            if (!state) {
+                showError('⚠️ Kripya State darj karein.');
+                stateInput?.focus();
+                return false;
+            }
+
+            const cleanPincode = pincode.replace(/[^0-9]/g, '');
+            if (cleanPincode.length !== 6) {
+                showError('⚠️ Kripya sahi 6-digit PIN Code darj karein.');
+                pincodeInput?.focus();
+                return false;
+            }
+
+            clearError();
+            return true;
+        };
+
+        // Step 2 -> Step 3
+        if (step2NextBtn) {
+            step2NextBtn.addEventListener('click', () => {
+                if (validateAddress()) {
+                    setWizardStep(3);
+                }
+            });
+        }
+
+        // Step 3 -> Step 2
+        if (step3BackBtn) {
+            step3BackBtn.addEventListener('click', () => {
+                setWizardStep(2);
+            });
+        }
+
+        // Copy Store UPI ID
+        if (copyUpiBtn) {
+            copyUpiBtn.addEventListener('click', async () => {
                 try {
                     await navigator.clipboard.writeText(STORE_UPI_ID);
                 } catch (err) {
@@ -664,84 +885,40 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.execCommand('copy');
                     document.body.removeChild(temp);
                 }
-                const originalHtml = copyBtn.innerHTML;
-                copyBtn.innerHTML = '<i class="bi bi-check2"></i> Copied!';
-                copyBtn.classList.add('bg-green-100', 'text-green-800', 'border-green-300');
+                const originalHtml = copyUpiBtn.innerHTML;
+                copyUpiBtn.innerHTML = '<i class="bi bi-check2"></i> Copied!';
+                copyUpiBtn.classList.add('bg-green-100', 'text-green-800', 'border-green-300');
                 setTimeout(() => {
-                    copyBtn.innerHTML = originalHtml;
-                    copyBtn.classList.remove('bg-green-100', 'text-green-800', 'border-green-300');
+                    copyUpiBtn.innerHTML = originalHtml;
+                    copyUpiBtn.classList.remove('bg-green-100', 'text-green-800', 'border-green-300');
                 }, 2000);
             });
         }
 
-        // Validate and submit order via WhatsApp
-        if (submitBtn) {
-            submitBtn.addEventListener('click', (e) => {
+        // Step 3: Final WhatsApp Multi-Product Order Confirmation
+        if (submitOrderBtn) {
+            submitOrderBtn.addEventListener('click', (e) => {
                 e.preventDefault();
+                const summary = getSummary();
+                if (summary.count === 0) {
+                    showToast('⚠️ No products in order.');
+                    setWizardStep(1);
+                    return;
+                }
+
+                if (!validateAddress()) {
+                    setWizardStep(2);
+                    return;
+                }
 
                 const name = nameInput ? nameInput.value.trim() : '';
-                const phone = phoneInput ? phoneInput.value.trim() : '';
+                const phone = phoneInput ? phoneInput.value.trim().replace(/[^0-9]/g, '') : '';
                 const address = addressInput ? addressInput.value.trim() : '';
                 const city = cityInput ? cityInput.value.trim() : '';
                 const state = stateInput ? stateInput.value.trim() : '';
-                const pincode = pincodeInput ? pincodeInput.value.trim() : '';
+                const pincode = pincodeInput ? pincodeInput.value.trim().replace(/[^0-9]/g, '') : '';
                 const utr = utrInput ? utrInput.value.trim() : '';
 
-                // Form validation
-                if (!name) {
-                    showError('⚠️ Kripya apna Poora Naam (Customer Name) darj karein.');
-                    nameInput?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    nameInput?.focus();
-                    return;
-                }
-
-                const cleanPhone = phone.replace(/[^0-9]/g, '');
-                if (cleanPhone.length < 10) {
-                    showError('⚠️ Kripya sahi 10-digit Mobile Number darj karein.');
-                    phoneInput?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    phoneInput?.focus();
-                    return;
-                }
-
-                if (!address) {
-                    showError('⚠️ Kripya Address Line (House/Shop No., Street, Landmark) darj karein.');
-                    addressInput?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    addressInput?.focus();
-                    return;
-                }
-
-                if (!city) {
-                    showError('⚠️ Kripya City / District darj karein.');
-                    cityInput?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    cityInput?.focus();
-                    return;
-                }
-
-                if (!state) {
-                    showError('⚠️ Kripya State darj karein.');
-                    stateInput?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    stateInput?.focus();
-                    return;
-                }
-
-                const cleanPincode = pincode.replace(/[^0-9]/g, '');
-                if (cleanPincode.length !== 6) {
-                    showError('⚠️ Kripya sahi 6-digit PIN Code darj karein.');
-                    pincodeInput?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    pincodeInput?.focus();
-                    return;
-                }
-
-                clearError();
-
-                // Purge any legacy stored customer details
-                try {
-                    ['name', 'phone', 'address', 'city', 'state', 'pincode'].forEach(k => {
-                        localStorage.removeItem('mr_customer_' + k);
-                    });
-                } catch (e) {}
-
-                // Formatted date and time
                 const now = new Date();
                 const formattedDate = now.toLocaleDateString('en-IN', {
                     day: 'numeric',
@@ -754,42 +931,248 @@ document.addEventListener('DOMContentLoaded', () => {
                     hour12: true
                 });
 
-                // Structured Row-wise Order & Payment Confirmation WhatsApp Message
-                const message = 
-`*🛒 NAYAA ORDER & UPI PAYMENT CONFIRMATION*
+                // Build row-by-row itemized list
+                const itemLines = cart.map((item, idx) => {
+                    const subtotal = item.unitRate * item.qty;
+                    return `${idx + 1}. *${item.title}*\n   • Qty: ${item.qty} units | Rate: ${formatINR(item.unitRate)} | Total: ${formatINR(subtotal)}`;
+                }).join('\n');
+
+                const message =
+`*🛒 NAYAA MULTI-PRODUCT ORDER & COMBINED UPI PAYMENT*
 ----------------------------------------
 *Dukaan:* MR Enterprises, Lucknow
 *Date & Time:* ${formattedDate} at ${formattedTime}
 
-*📦 ORDER DETAILS:*
-• *Product:* ${currentOrder.title}
-• *Quantity:* ${currentOrder.qty} units
-• *Unit Rate:* ${currentOrder.price}
-• *Total Payable:* ${currentOrder.formattedTotal}
+*📦 SELECTED PRODUCTS (${summary.count} Items / ${summary.totalUnits} Units):*
+${itemLines}
 
-*💳 PAYMENT VERIFICATION (Direct Store UPI):*
+----------------------------------------
+*💰 COMBINED GRAND TOTAL:* ${summary.formattedTotal}
+*🚚 Delivery Charge:* FREE Delivery in Lucknow
+
+*💳 PAYMENT MODE (Single Combined Transfer):*
 • *Store UPI ID:* ${STORE_UPI_ID}
-• *UPI Reference / UTR No.:* ${utr ? utr : 'Direct UPI Payment Done (Sharing Screenshot)'}
-• *Status:* Payment Done ✓ (0% Gateway Fee)
+• *Total Amount:* ${summary.formattedTotal}
+• *UPI Reference / UTR No.:* ${utr ? utr : 'Combined UPI Payment Done (Sharing Screenshot)'}
+• *Status:* Single Combined Transfer via UPI ✓
 
 *📍 CUSTOMER & COMPLETE DELIVERY ADDRESS:*
 • *Customer Name:* ${name}
-• *Phone Number:* +91 ${cleanPhone}
+• *Phone Number:* +91 ${phone}
 • *Address Line:* ${address}
 • *City / District:* ${city}
 • *State:* ${state}
-• *PIN Code:* ${cleanPincode}
-• *Full Address:* ${address.replace(/\r?\n+/g, ', ')}, ${city}, ${state} - ${cleanPincode}
+• *PIN Code:* ${pincode}
+• *Full Address:* ${address.replace(/\r?\n+/g, ', ')}, ${city}, ${state} - ${pincode}
 
 ----------------------------------------
-_Maine direct UPI par payment complete kar diya hai. Kripya payment verify karke order confirm & dispatch karein._`;
+_Maine upar diye gaye sabhi products ka ek sath combined payment UPI se transfer kar diya hai. Kripya payment verify karke dispatch confirm karein._`;
 
                 const whatsAppUrl = `https://wa.me/${STORE_PHONE}?text=${encodeURIComponent(message)}`;
                 window.open(whatsAppUrl, '_blank');
 
-                closeModal();
+                // Clear cart after successful order submission
+                cart = [];
+                renderCartUI();
+                closeCheckoutModal();
+                showToast('🎉 Order placed successfully on WhatsApp!');
             });
         }
+
+        // Close triggers
+        modalCloseBtns?.forEach(btn => btn.addEventListener('click', closeCheckoutModal));
+        if (modalBackdrop) modalBackdrop.addEventListener('click', closeCheckoutModal);
+        checkoutModal?.addEventListener('click', (e) => {
+            if (e.target === checkoutModal) closeCheckoutModal();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && checkoutModal && !checkoutModal.classList.contains('hidden')) {
+                closeCheckoutModal();
+            }
+        });
+
+        // Open Cart triggers (Header buttons & Floating bar buttons)
+        document.querySelectorAll('[data-open-cart-btn]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                openCheckoutModal(1);
+            });
+        });
+
+        // ----------------------------------------------------
+        // Product Card Listeners: Quantity - / + and "+ Add to Order"
+        // ----------------------------------------------------
+        document.querySelectorAll('[data-product-card]').forEach(card => {
+            const minusBtn = card.querySelector('[data-card-qty-minus]');
+            const plusBtn = card.querySelector('[data-card-qty-plus]');
+            const input = card.querySelector('[data-card-qty-input]');
+            const addBtn = card.querySelector('[data-card-add-btn]');
+
+            const title = card.getAttribute('data-product-title') || 'Product';
+            const priceStr = card.getAttribute('data-product-price') || '₹0';
+            const brand = card.getAttribute('data-product-brand') || '';
+            const category = card.getAttribute('data-product-category') || '';
+            const img = card.querySelector('img')?.src || '';
+
+            if (plusBtn && input) {
+                plusBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    let currentVal = parseInt(input.value, 10) || 1;
+                    input.value = currentVal + 1;
+                });
+            }
+
+            if (minusBtn && input) {
+                minusBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    let currentVal = parseInt(input.value, 10) || 1;
+                    if (currentVal > 1) {
+                        input.value = currentVal - 1;
+                    }
+                });
+            }
+
+            if (addBtn && input) {
+                addBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const cardTitle = (card.getAttribute('data-product-title') || '').trim().toLowerCase();
+                    const inCartItem = cart.find(i => i.title.trim().toLowerCase() === cardTitle);
+                    const qty = parseInt(input.value, 10) || 1;
+
+                    // If product is already in cart and stepper is default 1, clicking 'Go to Cart' opens the cart modal!
+                    if (inCartItem && qty === 1) {
+                        openCheckoutModal(1);
+                        return;
+                    }
+
+                    // Otherwise, add/increase product in cart
+                    addToCart({
+                        title,
+                        priceStr,
+                        brand,
+                        category,
+                        img
+                    }, qty);
+
+                    // Reset card input stepper to 1
+                    input.value = 1;
+
+                    // Micro-pulse animation feedback on card
+                    card.classList.add('scale-[1.02]');
+                    setTimeout(() => card.classList.remove('scale-[1.02]'), 220);
+                });
+            }
+        });
+
+        // ----------------------------------------------------
+        // Quick View Modal Controller (with "+ Add to Order" & "Confirm Order")
+        // ----------------------------------------------------
+        const quickViewModal = document.getElementById('quick-view-modal');
+        if (quickViewModal) {
+            const qvCloseBtn = quickViewModal.querySelector('[data-modal-close]');
+            const qvBackdrop = quickViewModal.querySelector('[data-modal-backdrop]');
+            const qvImg = quickViewModal.querySelector('[data-modal-img]');
+            const qvTitle = quickViewModal.querySelector('[data-modal-title]');
+            const qvBrand = quickViewModal.querySelector('[data-modal-brand]');
+            const qvCategory = quickViewModal.querySelector('[data-modal-category]');
+            const qvPrice = quickViewModal.querySelector('[data-modal-price]');
+            const qvMrp = quickViewModal.querySelector('[data-modal-mrp]');
+            const qvSpecs = quickViewModal.querySelector('[data-modal-specs]');
+            const qvQty = quickViewModal.querySelector('[data-modal-qty]');
+            const qvMinus = quickViewModal.querySelector('[data-qty-minus]');
+            const qvPlus = quickViewModal.querySelector('[data-qty-plus]');
+            const qvAddBtn = quickViewModal.querySelector('[data-modal-add-btn]');
+            const qvCheckoutBtn = quickViewModal.querySelector('[data-modal-checkout-btn]');
+
+            let currentQvQty = 1;
+            let currentQvProduct = null;
+
+            const closeQv = () => {
+                quickViewModal.classList.add('hidden');
+                document.body.style.overflow = '';
+            };
+
+            const openQv = (card) => {
+                currentQvQty = 1;
+                currentQvProduct = {
+                    title: card.getAttribute('data-product-title') || 'Product',
+                    priceStr: card.getAttribute('data-product-price') || '₹0',
+                    brand: card.getAttribute('data-product-brand') || '',
+                    category: card.getAttribute('data-product-category') || '',
+                    mrp: card.getAttribute('data-product-mrp') || '',
+                    img: card.querySelector('img')?.src || '',
+                    specs: card.getAttribute('data-product-specs') || '100% Genuine Covered Product'
+                };
+
+                if (qvImg) qvImg.src = currentQvProduct.img;
+                if (qvTitle) qvTitle.textContent = currentQvProduct.title;
+                if (qvBrand) qvBrand.textContent = currentQvProduct.brand.toUpperCase();
+                if (qvCategory) qvCategory.textContent = currentQvProduct.category;
+                if (qvPrice) qvPrice.textContent = currentQvProduct.priceStr;
+                if (qvMrp) qvMrp.textContent = currentQvProduct.mrp;
+                if (qvSpecs) qvSpecs.textContent = currentQvProduct.specs;
+                if (qvQty) qvQty.textContent = currentQvQty;
+
+                quickViewModal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            };
+
+            document.querySelectorAll('[data-quick-view-btn]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const card = btn.closest('[data-product-card]');
+                    if (card) openQv(card);
+                });
+            });
+
+            if (qvPlus) {
+                qvPlus.addEventListener('click', () => {
+                    currentQvQty++;
+                    if (qvQty) qvQty.textContent = currentQvQty;
+                });
+            }
+
+            if (qvMinus) {
+                qvMinus.addEventListener('click', () => {
+                    if (currentQvQty > 1) {
+                        currentQvQty--;
+                        if (qvQty) qvQty.textContent = currentQvQty;
+                    }
+                });
+            }
+
+            if (qvAddBtn) {
+                qvAddBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (currentQvProduct) {
+                        addToCart(currentQvProduct, currentQvQty);
+                        closeQv();
+                    }
+                });
+            }
+
+            if (qvCheckoutBtn) {
+                qvCheckoutBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (currentQvProduct) {
+                        addToCart(currentQvProduct, currentQvQty);
+                        closeQv();
+                        openCheckoutModal(1);
+                    }
+                });
+            }
+
+            if (qvCloseBtn) qvCloseBtn.addEventListener('click', closeQv);
+            if (qvBackdrop) qvBackdrop.addEventListener('click', closeQv);
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && !quickViewModal.classList.contains('hidden')) {
+                    closeQv();
+                }
+            });
+        }
+
+        // Initial UI render
+        renderCartUI();
     };
 
     // ----------------------------------------------------
@@ -1058,17 +1441,66 @@ _Maine direct UPI par payment complete kar diya hai. Kripya payment verify karke
         }, { passive: true });
     };
 
+    // ----------------------------------------------------
+    // 11. ON-SCROLL PROGRESSIVE PRODUCT SECTION REVEAL (SEO & SPEED)
+    // ----------------------------------------------------
+    const categoryScrollRevealController = () => {
+        const categoryBlocks = document.querySelectorAll('[data-category-block]');
+        if (!categoryBlocks.length) return;
+
+        // If IntersectionObserver is not supported (e.g. legacy browsers or search crawler bots), reveal immediately
+        if (!('IntersectionObserver' in window)) {
+            categoryBlocks.forEach(block => block.classList.add('is-revealed'));
+            return;
+        }
+
+        // Apply progressive reveal class via JS so if JS is disabled, content remains 100% visible by default for SEO crawlers
+        categoryBlocks.forEach((block, index) => {
+            block.classList.add('scroll-reveal-section');
+            // Reveal the first category block immediately so initial above-the-fold content is instantly visible
+            if (index === 0) {
+                block.classList.add('is-revealed');
+            }
+        });
+
+        const revealObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-revealed');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, {
+            root: null,
+            rootMargin: '120px 0px -30px 0px', // Preloads smoothly 120px before user arrives at the section
+            threshold: 0.05
+        });
+
+        categoryBlocks.forEach(block => {
+            if (!block.classList.contains('is-revealed')) {
+                revealObserver.observe(block);
+            }
+        });
+
+        // Global helper for search and brand filter to reveal all blocks instantly
+        window.revealAllCategoryBlocks = () => {
+            categoryBlocks.forEach(block => {
+                block.classList.add('is-revealed');
+                revealObserver.unobserve(block);
+            });
+        };
+    };
+
     // Initialize all modules
     heroSlider();
     mobileMenu();
     brandTabs();
     liveSearch();
     productSliderControls();
-    cardQuantityController();
-    quickViewModal();
-    upiPaymentModalController();
+    orderCartAndCheckoutController();
     bulkInquiryBuilder();
     galleryLightboxController();
+    categoryScrollRevealController();
 });
 
 

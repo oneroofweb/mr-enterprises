@@ -46,37 +46,13 @@ body {
     scrollbar-width: none;
 }
 
-/* Product slider responsive item sizing */
-.product-slide-item {
-    flex: 0 0 auto;
-    width: min(265px, 78vw); /* Increased width for clear visibility and comfortable thumb touch on mobile */
-}
-@media (min-width: 640px) {
-    .product-slide-item { width: 230px; }
-}
-@media (min-width: 768px) {
-    .product-slide-item { width: 250px; }
-}
-@media (min-width: 1024px) {
-    .product-slide-item {
-        /* Desktop: 4 items visible comfortably */
-        width: calc(25% - 18px);
-    }
-}
-@media (min-width: 1280px) {
-    .product-slide-item {
-        /* Large Desktop: 5 items visible */
-        width: calc(20% - 16px);
-    }
-}
-
-/* Product Showcase card top image and container radius matching main wrapper div */
-.product-slide-item .group {
+/* Product Grid & Card Styling */
+[data-product-card] {
     border-radius: 0.75rem; /* rounded-xl */
     overflow: hidden;
 }
-.product-slide-item .group > div:first-child,
-.product-slide-item .group > div:first-child img {
+[data-product-card] > div:first-child,
+[data-product-card] > div:first-child img {
     border-top-left-radius: inherit;
     border-top-right-radius: inherit;
 }
@@ -145,11 +121,19 @@ body {
 /* Full-bleed Hero Banner Container (Edge-to-edge, Flush on top, Exact Aspect) */
 .hero-banner-container {
     width: 100%;
-    aspect-ratio: 1 / 1; /* Exact 1:1 match for 800x800 mobile banner without cropping */
+    aspect-ratio: 5 / 3; /* Exact 40% height reduction from 1:1 on mobile (Web Design Standard 5:3 / ~1.67:1 for above-the-fold visibility) */
+    max-height: 280px; /* Safe upper bound for larger mobile devices */
+}
+@media (min-width: 640px) {
+    .hero-banner-container {
+        aspect-ratio: 2 / 1;
+        max-height: 380px;
+    }
 }
 @media (min-width: 768px) {
     .hero-banner-container {
         aspect-ratio: 3 / 1; /* Exact 3:1 match for 1920x640 desktop banner without cropping */
+        max-height: 520px;
     }
 }
 
@@ -184,5 +168,54 @@ html {
     transition: opacity 0.25s ease-out;
     will-change: opacity;
 }
+
+/* ==================================================== */
+/* ON-SCROLL PROGRESSIVE PRODUCT SECTION REVEAL (SEO & PERF) */
+/* ==================================================== */
+.scroll-reveal-section {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1), transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+}
+
+.scroll-reveal-section.is-revealed {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Staggered micro-delays for product cards inside revealed category block */
+.scroll-reveal-section.is-revealed [data-product-card] {
+    animation: fadeInUpProductCard 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.scroll-reveal-section.is-revealed [data-product-card]:nth-child(1) { animation-delay: 0.04s; }
+.scroll-reveal-section.is-revealed [data-product-card]:nth-child(2) { animation-delay: 0.10s; }
+.scroll-reveal-section.is-revealed [data-product-card]:nth-child(3) { animation-delay: 0.16s; }
+.scroll-reveal-section.is-revealed [data-product-card]:nth-child(4) { animation-delay: 0.22s; }
+
+@keyframes fadeInUpProductCard {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Reduced Motion Support for Accessibility */
+@media (prefers-reduced-motion: reduce) {
+    .scroll-reveal-section {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+    }
+    .scroll-reveal-section.is-revealed [data-product-card] {
+        animation: none !important;
+    }
+}
+
 
 
