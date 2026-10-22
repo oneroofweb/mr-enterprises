@@ -238,13 +238,13 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.addEventListener('click', () => {
                 const targetBrand = btn.getAttribute('data-brand-tab');
 
-                // Update active state of buttons
+                // Update active state of buttons - switch filter on click filter menu text color set black
                 tabBtns.forEach(b => {
-                    b.classList.remove('bg-blue-600', 'text-white', 'border-blue-600');
-                    b.classList.add('bg-white', 'text-gray-600', 'border-gray-200');
+                    b.classList.remove('bg-yellow-400', 'border-yellow-500', 'active-brand-tab', 'shadow-xs', 'bg-blue-600', 'text-white', 'border-blue-600');
+                    b.classList.add('bg-white', 'text-black', 'border-gray-300');
                 });
-                btn.classList.remove('bg-white', 'text-gray-600', 'border-gray-200');
-                btn.classList.add('bg-blue-600', 'text-white', 'border-blue-600');
+                btn.classList.remove('bg-white', 'border-gray-300');
+                btn.classList.add('bg-yellow-400', 'text-black', 'border-yellow-500', 'active-brand-tab', 'shadow-xs');
 
                 // Filter products
                 productItems.forEach(item => {

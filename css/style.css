@@ -216,6 +216,20 @@ html {
         animation: none !important;
     }
 }
+/* ---------------------------------------------------- */
+/* Brand Filter Menu - Pure Black Text on Switch & Click */
+/* ---------------------------------------------------- */
+[data-brand-tab] {
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+    font-weight: 700;
+}
 
-
+[data-brand-tab].active-brand-tab {
+    background-color: #facc15 !important;
+    border-color: #eab308 !important;
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+    font-weight: 900 !important;
+}
 
