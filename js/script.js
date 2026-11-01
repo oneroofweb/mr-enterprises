@@ -1491,7 +1491,52 @@ _Maine upar diye gaye sabhi products ka ek sath combined payment UPI se transfer
         };
     };
 
+    // ----------------------------------------------------
+    // 10. DYNAMIC STORE DATA HYDRATOR (LOCALSTORAGE / API SYNC)
+    // ----------------------------------------------------
+    const dynamicStoreDataHydrator = () => {
+        try {
+            const raw = localStorage.getItem('mr_enterprises_store_data');
+            if (!raw) return;
+            const data = JSON.parse(raw);
+            if (!data) return;
+
+            // 1. Hydrate Hero Slides if customized in Admin
+            if (data.heroSlides && data.heroSlides.length > 0) {
+                const slideEls = document.querySelectorAll('[data-hero-slide]');
+                data.heroSlides.slice(0, slideEls.length).forEach((s, i) => {
+                    if (slideEls[i]) {
+                        const img = slideEls[i].querySelector('img');
+                        const source = slideEls[i].querySelector('source');
+                        if (img && s.mobile) img.src = s.mobile;
+                        if (source && s.desktop) source.srcset = s.desktop;
+                        const link = slideEls[i].querySelector('a');
+                        if (link && s.link) link.href = s.link;
+                    }
+                });
+            }
+
+            // 2. Hydrate Product Prices & Badges if customized in Admin
+            if (data.products && data.products.length > 0) {
+                const prodCards = document.querySelectorAll('[data-product-card]');
+                prodCards.forEach(card => {
+                    const titleEl = card.querySelector('[data-product-title]');
+                    const priceEl = card.querySelector('[data-product-price]');
+                    if (!titleEl || !priceEl) return;
+                    const cardTitle = titleEl.textContent.trim().toLowerCase();
+                    const matched = data.products.find(p => p.title.toLowerCase() === cardTitle);
+                    if (matched) {
+                        priceEl.textContent = `₹${matched.price.toFixed(2)}`;
+                    }
+                });
+            }
+        } catch (e) {
+            console.warn('Hydration skipped:', e);
+        }
+    };
+
     // Initialize all modules
+    dynamicStoreDataHydrator();
     heroSlider();
     mobileMenu();
     brandTabs();

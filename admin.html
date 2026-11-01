@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MR Enterprises — Admin Control Panel</title>
+    <meta name="description" content="Admin Dashboard to manage Hero Slider, Categories, Brands, Products, and Gallery for MR Enterprises">
+    <meta name="robots" content="noindex, nofollow">
+
+    <!-- Google Fonts: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'mr-blue': '#0a1d48',
+                        'mr-red': '#e31e24',
+                        'mr-green': '#25D366',
+                        'mr-light': '#f8fafc'
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #0f172a;
+            color: #0f172a;
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Custom scrollbar for data tables */
+        .custom-scroll::-webkit-scrollbar {
+            height: 6px;
+            width: 6px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen text-slate-800 antialiased font-sans selection:bg-blue-600 selection:text-white">
+
+    <!-- Layout Wrapper -->
+    <div class="flex min-h-screen">
+
+        <!-- ==================================================== -->
+        <!-- SIDEBAR NAVIGATION -->
+        <!-- ==================================================== -->
+        <aside id="admin-sidebar" class="fixed inset-y-0 left-0 z-50 w-72 bg-[#0a1d48] text-white flex flex-col transition-transform duration-300 -translate-x-full lg:translate-x-0 shadow-2xl">
+            <!-- Brand Header -->
+            <div class="p-5 border-b border-blue-900/60 flex items-center justify-between">
+                <a href="admin.html" class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-white flex items-center justify-center font-black text-mr-blue text-lg italic shadow-md">
+                        M<span class="text-mr-red">R</span>
+                    </div>
+                    <div>
+                        <div class="font-black text-lg leading-tight tracking-tight">
+                            MR <span class="text-red-400">ENTERPRISES</span>
+                        </div>
+                        <div class="text-[10px] font-bold tracking-widest text-blue-300 uppercase">
+                            Admin Control Hub
+                        </div>
+                    </div>
+                </a>
+
+                <button id="close-sidebar-btn" type="button" class="lg:hidden text-gray-300 hover:text-white p-1 rounded-lg">
+                    <i class="bi bi-x-lg text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Navigation Links -->
+            <div class="flex-1 overflow-y-auto px-4 py-5 space-y-1.5 custom-scroll">
+                <div class="text-[11px] font-extrabold uppercase tracking-wider text-blue-300/60 px-3 mb-2">
+                    Core Modules
+                </div>
+
+                <button type="button" data-nav-target="dashboard" class="nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-bold text-sm transition bg-blue-600 text-white shadow-md shadow-blue-900/40">
+                    <span class="flex items-center gap-3">
+                        <i class="bi bi-speedometer2 text-base"></i>
+                        <span>Dashboard Overview</span>
+                    </span>
+                    <span class="text-xs bg-white/20 px-2 py-0.5 rounded-full">Live</span>
+                </button>
+
+                <button type="button" data-nav-target="hero" class="nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-bold text-sm transition text-blue-100 hover:bg-blue-900/40 hover:text-white">
+                    <span class="flex items-center gap-3">
+                        <i class="bi bi-images text-base text-yellow-400"></i>
+                        <span>Hero Slider</span>
+                    </span>
+                    <span id="badge-hero-count" class="text-xs bg-blue-950 px-2 py-0.5 rounded-full font-mono text-yellow-300">2</span>
+                </button>
+
+                <button type="button" data-nav-target="categories" class="nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-bold text-sm transition text-blue-100 hover:bg-blue-900/40 hover:text-white">
+                    <span class="flex items-center gap-3">
+                        <i class="bi bi-grid-3x3-gap-fill text-base text-amber-400"></i>
+                        <span>Categories</span>
+                    </span>
+                    <span id="badge-category-count" class="text-xs bg-blue-950 px-2 py-0.5 rounded-full font-mono text-amber-300">8</span>
+                </button>
+
+                <button type="button" data-nav-target="brands" class="nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-bold text-sm transition text-blue-100 hover:bg-blue-900/40 hover:text-white">
+                    <span class="flex items-center gap-3">
+                        <i class="bi bi-patch-check-fill text-base text-cyan-400"></i>
+                        <span>Brands</span>
+                    </span>
+                    <span id="badge-brand-count" class="text-xs bg-blue-950 px-2 py-0.5 rounded-full font-mono text-cyan-300">8</span>
+                </button>
+
+                <button type="button" data-nav-target="products" class="nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-bold text-sm transition text-blue-100 hover:bg-blue-900/40 hover:text-white">
+                    <span class="flex items-center gap-3">
+                        <i class="bi bi-box-seam-fill text-base text-emerald-400"></i>
+                        <span>Product Catalog</span>
+                    </span>
+                    <span id="badge-product-count" class="text-xs bg-blue-950 px-2 py-0.5 rounded-full font-mono text-emerald-300">16</span>
+                </button>
+
+                <button type="button" data-nav-target="gallery" class="nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-bold text-sm transition text-blue-100 hover:bg-blue-900/40 hover:text-white">
+                    <span class="flex items-center gap-3">
+                        <i class="bi bi-camera-fill text-base text-purple-400"></i>
+                        <span>Store Gallery</span>
+                    </span>
+                    <span id="badge-gallery-count" class="text-xs bg-blue-950 px-2 py-0.5 rounded-full font-mono text-purple-300">3</span>
+                </button>
+
+                <div class="pt-4 text-[11px] font-extrabold uppercase tracking-wider text-blue-300/60 px-3 mb-2">
+                    Backend & Storage
+                </div>
+
+                <button type="button" data-nav-target="sync" class="nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-bold text-sm transition text-blue-100 hover:bg-blue-900/40 hover:text-white">
+                    <span class="flex items-center gap-3">
+                        <i class="bi bi-database-fill-gear text-base text-pink-400"></i>
+                        <span>Data & Backend Bridge</span>
+                    </span>
+                    <span class="text-[10px] bg-emerald-500/30 text-emerald-300 px-1.5 py-0.5 rounded font-mono">JSON API</span>
+                </button>
+            </div>
+
+            <!-- Footer User / Storefront Link -->
+            <div class="p-4 bg-slate-950/60 border-t border-blue-900/60 space-y-2">
+                <a href="index.html" target="_blank" class="w-full flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#1da851] text-white py-2.5 px-3 rounded-xl font-bold text-xs transition shadow-md">
+                    <i class="bi bi-box-arrow-up-right"></i>
+                    <span>View Live Storefront</span>
+                </a>
+                <div class="flex items-center justify-between text-[11px] text-blue-300/70 pt-1 px-1">
+                    <span>Store: Lucknow, UP</span>
+                    <span class="flex items-center gap-1.5 text-emerald-400">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        Static UI Active
+                    </span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Backdrop for mobile sidebar -->
+        <div id="sidebar-backdrop" class="fixed inset-0 z-40 bg-slate-950/60 backdrop-blur-xs hidden lg:hidden"></div>
+
+        <!-- ==================================================== -->
+        <!-- MAIN CONTENT AREA -->
+        <!-- ==================================================== -->
+        <div class="flex-1 lg:ml-72 flex flex-col min-h-screen">
+
+            <!-- Top Header Bar -->
+            <header class="sticky top-0 z-30 bg-white border-b border-slate-200/80 px-4 sm:px-6 py-3.5 flex items-center justify-between shadow-xs">
+                <div class="flex items-center gap-3">
+                    <button id="open-sidebar-btn" type="button" class="lg:hidden p-2 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200">
+                        <i class="bi bi-list text-xl"></i>
+                    </button>
+                    <div>
+                        <h1 id="page-title" class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Dashboard Overview</h1>
+                        <p id="page-subtitle" class="text-xs text-slate-500 hidden sm:block">Real-time status and quick management for MR Enterprises storefront.</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2.5 sm:gap-3">
+                    <!-- Quick Add Dropdown -->
+                    <div class="relative">
+                        <button id="quick-add-btn" type="button" class="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-2 rounded-xl font-bold text-xs sm:text-sm shadow-sm transition active:scale-95 cursor-pointer">
+                            <i class="bi bi-plus-lg text-sm"></i>
+                            <span class="hidden sm:inline">Add Item</span>
+                            <i class="bi bi-chevron-down text-xs ml-0.5"></i>
+                        </button>
+                        <!-- Dropdown Menu -->
+                        <div id="quick-add-menu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-slate-100 py-1.5 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                            <button type="button" onclick="adminApp.openModal('product')" class="w-full text-left px-3.5 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 hover:text-blue-600 flex items-center gap-2">
+                                <i class="bi bi-box-seam text-emerald-500"></i> New Product
+                            </button>
+                            <button type="button" onclick="adminApp.openModal('hero')" class="w-full text-left px-3.5 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 hover:text-blue-600 flex items-center gap-2">
+                                <i class="bi bi-images text-yellow-500"></i> New Hero Slide
+                            </button>
+                            <button type="button" onclick="adminApp.openModal('category')" class="w-full text-left px-3.5 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 hover:text-blue-600 flex items-center gap-2">
+                                <i class="bi bi-grid text-amber-500"></i> New Category
+                            </button>
+                            <button type="button" onclick="adminApp.openModal('brand')" class="w-full text-left px-3.5 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 hover:text-blue-600 flex items-center gap-2">
+                                <i class="bi bi-patch-check text-cyan-500"></i> New Brand
+                            </button>
+                            <button type="button" onclick="adminApp.openModal('gallery')" class="w-full text-left px-3.5 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 hover:text-blue-600 flex items-center gap-2">
+                                <i class="bi bi-camera text-purple-500"></i> New Gallery Photo
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Direct Store Preview -->
+                    <a href="index.html" target="_blank" class="hidden md:flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-xl font-bold text-xs transition">
+                        <i class="bi bi-shop"></i>
+                        <span>Storefront</span>
+                    </a>
+
+                    <!-- Admin Profile Badge -->
+                    <div class="flex items-center gap-2 pl-2 border-l border-slate-200">
+                        <div class="w-9 h-9 rounded-xl bg-mr-blue text-white flex items-center justify-center font-black text-xs shadow-xs">
+                            AD
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Content Views Container -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-8 max-w-7xl w-full mx-auto">
+
+                <!-- ==================================================== -->
+                <!-- 1. DASHBOARD VIEW -->
+                <!-- ==================================================== -->
+                <section id="view-dashboard" class="content-view space-y-6">
+                    <!-- Stat Metric Cards -->
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+                        <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between hover:shadow-md transition">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Products</span>
+                                <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm font-bold">
+                                    <i class="bi bi-box-seam"></i>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <div id="stat-products-count" class="text-2xl font-black text-slate-900">16</div>
+                                <div class="text-[10px] text-emerald-600 font-bold mt-0.5">In Catalog</div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between hover:shadow-md transition">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Categories</span>
+                                <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-sm font-bold">
+                                    <i class="bi bi-grid-3x3-gap"></i>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <div id="stat-categories-count" class="text-2xl font-black text-slate-900">8</div>
+                                <div class="text-[10px] text-amber-600 font-bold mt-0.5">8 Display Blocks</div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between hover:shadow-md transition">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Brands</span>
+                                <div class="w-8 h-8 rounded-lg bg-cyan-50 text-cyan-600 flex items-center justify-center text-sm font-bold">
+                                    <i class="bi bi-patch-check"></i>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <div id="stat-brands-count" class="text-2xl font-black text-slate-900">8</div>
+                                <div class="text-[10px] text-cyan-600 font-bold mt-0.5">Authorized Brands</div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between hover:shadow-md transition">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Hero Slides</span>
+                                <div class="w-8 h-8 rounded-lg bg-yellow-50 text-yellow-600 flex items-center justify-center text-sm font-bold">
+                                    <i class="bi bi-images"></i>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <div id="stat-hero-count" class="text-2xl font-black text-slate-900">2</div>
+                                <div class="text-[10px] text-yellow-600 font-bold mt-0.5">Auto-playing</div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between hover:shadow-md transition">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Gallery</span>
+                                <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center text-sm font-bold">
+                                    <i class="bi bi-camera"></i>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <div id="stat-gallery-count" class="text-2xl font-black text-slate-900">3</div>
+                                <div class="text-[10px] text-purple-600 font-bold mt-0.5">Showroom Lightbox</div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between hover:shadow-md transition">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Storage</span>
+                                <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-sm font-bold">
+                                    <i class="bi bi-hdd-network"></i>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <div class="text-2xl font-black text-slate-900">Local</div>
+                                <div class="text-[10px] text-blue-600 font-bold mt-0.5">Ready for API</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Navigation Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                        <!-- Card 1: Hero Banner Status -->
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between mb-3">
+                                    <span class="text-xs font-black uppercase text-yellow-600 tracking-wider flex items-center gap-1.5">
+                                        <i class="bi bi-image-fill"></i> Hero Slider Banner
+                                    </span>
+                                    <span class="text-[10px] bg-yellow-100 text-yellow-800 font-bold px-2 py-0.5 rounded-full">Top Above Fold</span>
+                                </div>
+                                <h3 class="text-base font-black text-slate-900 mb-1">Promotional Slider</h3>
+                                <p class="text-xs text-slate-500 mb-4">Manage responsive desktop and mobile slides with custom target URLs.</p>
+                                <div id="dash-hero-preview" class="rounded-xl overflow-hidden aspect-[16/6] bg-slate-100 border border-slate-200 relative mb-4">
+                                    <img src="assets/images/banners/01M2DATJWCE0W85RAQES221FXK.webp" alt="Slide Preview" class="w-full h-full object-cover">
+                                    <div class="absolute bottom-2 left-2 px-2 py-0.5 rounded bg-black/70 text-white text-[10px] font-mono">
+                                        Active Slide #1
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" onclick="adminApp.navigate('hero')" class="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs transition flex items-center justify-center gap-1.5">
+                                <span>Configure Slider</span>
+                                <i class="bi bi-arrow-right"></i>
+                            </button>
+                        </div>
+
+                        <!-- Card 2: Catalog Quick Status -->
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between mb-3">
+                                    <span class="text-xs font-black uppercase text-emerald-600 tracking-wider flex items-center gap-1.5">
+                                        <i class="bi bi-lightning-charge-fill"></i> Store Catalog
+                                    </span>
+                                    <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">Direct UPI & WhatsApp</span>
+                                </div>
+                                <h3 class="text-base font-black text-slate-900 mb-1">8 Categories & 8 Brands</h3>
+                                <p class="text-xs text-slate-500 mb-4">Manage prices, discounts, stock availability, and WhatsApp quotation tags.</p>
+                                <div class="space-y-2 mb-4 text-xs font-semibold">
+                                    <div class="flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-100">
+                                        <span class="text-slate-600">LED Lighting & BLDC Fans</span>
+                                        <span class="font-bold text-slate-900">8 Items</span>
+                                    </div>
+                                    <div class="flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-100">
+                                        <span class="text-slate-600">Wires, Cables & Switchgear</span>
+                                        <span class="font-bold text-slate-900">8 Items</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" onclick="adminApp.navigate('products')" class="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs transition flex items-center justify-center gap-1.5">
+                                <span>Manage Products</span>
+                                <i class="bi bi-arrow-right"></i>
+                            </button>
+                        </div>
+
+                        <!-- Card 3: Backend Bridge Status -->
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between mb-3">
+                                    <span class="text-xs font-black uppercase text-pink-600 tracking-wider flex items-center gap-1.5">
+                                        <i class="bi bi-diagram-3-fill"></i> Backend Sync
+                                    </span>
+                                    <span class="text-[10px] bg-pink-100 text-pink-800 font-bold px-2 py-0.5 rounded-full">Zero-Backend Ready</span>
+                                </div>
+                                <h3 class="text-base font-black text-slate-900 mb-1">JSON API Bridge</h3>
+                                <p class="text-xs text-slate-500 mb-4">Export all store data to JSON or hook directly into Node.js / PHP / Supabase REST API.</p>
+                                <div class="p-3 rounded-xl bg-slate-900 text-emerald-400 font-mono text-[11px] space-y-1 mb-4 overflow-hidden">
+                                    <div class="text-slate-400">// Ready REST Endpoints</div>
+                                    <div>GET  /api/hero-slides</div>
+                                    <div>GET  /api/categories</div>
+                                    <div>GET  /api/brands</div>
+                                    <div>GET  /api/products</div>
+                                    <div>GET  /api/gallery</div>
+                                </div>
+                            </div>
+                            <button type="button" onclick="adminApp.navigate('sync')" class="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs transition flex items-center justify-center gap-1.5">
+                                <span>Backend Data Export / Import</span>
+                                <i class="bi bi-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Recent Products Preview Table -->
+                    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+                        <div class="p-4 sm:p-5 border-b border-slate-200/80 flex items-center justify-between flex-wrap gap-2">
+                            <div>
+                                <h3 class="font-black text-base text-slate-900">Recently Added / Featured Products</h3>
+                                <p class="text-xs text-slate-500">Live preview of catalog items active on storefront.</p>
+                            </div>
+                            <button type="button" onclick="adminApp.navigate('products')" class="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1">
+                                <span>View all products</span>
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
+                        </div>
+
+                        <div class="overflow-x-auto custom-scroll">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-slate-50 text-slate-500 uppercase font-extrabold text-[10px] tracking-wider border-b border-slate-200">
+                                    <tr>
+                                        <th class="py-3 px-4">Product</th>
+                                        <th class="py-3 px-4">Brand</th>
+                                        <th class="py-3 px-4">Category</th>
+                                        <th class="py-3 px-4">Price / MRP</th>
+                                        <th class="py-3 px-4">Stock</th>
+                                        <th class="py-3 px-4 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dashboard-recent-products" class="divide-y divide-slate-100 font-medium">
+                                    <!-- Rendered dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ==================================================== -->
+                <!-- 2. HERO SLIDER VIEW -->
+                <!-- ==================================================== -->
+                <section id="view-hero" class="content-view hidden space-y-6">
+                    <div class="flex items-center justify-between flex-wrap gap-3 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+                        <div>
+                            <h2 class="text-lg font-black text-slate-900">Hero Slider Manager</h2>
+                            <p class="text-xs text-slate-500">Configure top promotional slides (desktop & mobile banners, target links, sort order).</p>
+                        </div>
+                        <button type="button" onclick="adminApp.openModal('hero')" class="bg-yellow-400 hover:bg-yellow-500 text-black px-4 py-2 rounded-xl font-black text-xs sm:text-sm shadow-sm transition flex items-center gap-2 cursor-pointer">
+                            <i class="bi bi-plus-lg"></i>
+                            <span>Add New Slide</span>
+                        </button>
+                    </div>
+
+                    <!-- Slide Cards Grid -->
+                    <div id="hero-slides-container" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <!-- Rendered dynamically -->
+                    </div>
+                </section>
+
+                <!-- ==================================================== -->
+                <!-- 3. CATEGORIES VIEW -->
+                <!-- ==================================================== -->
+                <section id="view-categories" class="content-view hidden space-y-6">
+                    <div class="flex items-center justify-between flex-wrap gap-3 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+                        <div>
+                            <h2 class="text-lg font-black text-slate-900">Category Manager</h2>
+                            <p class="text-xs text-slate-500">Organize store catalog into categories with images, descriptions, and sort priorities.</p>
+                        </div>
+                        <button type="button" onclick="adminApp.openModal('category')" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-xl font-black text-xs sm:text-sm shadow-sm transition flex items-center gap-2 cursor-pointer">
+                            <i class="bi bi-plus-lg"></i>
+                            <span>Add New Category</span>
+                        </button>
+                    </div>
+
+                    <!-- Categories Cards Grid -->
+                    <div id="categories-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+                        <!-- Rendered dynamically -->
+                    </div>
+                </section>
+
+                <!-- ==================================================== -->
+                <!-- 4. BRANDS VIEW -->
+                <!-- ==================================================== -->
+                <section id="view-brands" class="content-view hidden space-y-6">
+                    <div class="flex items-center justify-between flex-wrap gap-3 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+                        <div>
+                            <h2 class="text-lg font-black text-slate-900">Brand Partner Manager</h2>
+                            <p class="text-xs text-slate-500">Manage brand logos and filter tabs (Havells, Polycab, Anchor, REO, CONA, Philips, Crompton, etc.).</p>
+                        </div>
+                        <button type="button" onclick="adminApp.openModal('brand')" class="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-xl font-black text-xs sm:text-sm shadow-sm transition flex items-center gap-2 cursor-pointer">
+                            <i class="bi bi-plus-lg"></i>
+                            <span>Add New Brand</span>
+                        </button>
+                    </div>
+
+                    <!-- Brands Grid -->
+                    <div id="brands-container" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                        <!-- Rendered dynamically -->
+                    </div>
+                </section>
+
+                <!-- ==================================================== -->
+                <!-- 5. PRODUCTS VIEW -->
+                <!-- ==================================================== -->
+                <section id="view-products" class="content-view hidden space-y-6">
+                    <!-- Filters and Search Bar -->
+                    <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs space-y-4">
+                        <div class="flex items-center justify-between flex-wrap gap-3">
+                            <div>
+                                <h2 class="text-lg font-black text-slate-900">Product Catalog Management</h2>
+                                <p class="text-xs text-slate-500">Edit prices, wholesale rates, stock quantities, and product images.</p>
+                            </div>
+                            <button type="button" onclick="adminApp.openModal('product')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl font-black text-xs sm:text-sm shadow-sm transition flex items-center gap-2 cursor-pointer">
+                                <i class="bi bi-plus-lg"></i>
+                                <span>Add New Product</span>
+                            </button>
+                        </div>
+
+                        <!-- Search & Filter Controls -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2">
+                            <div class="relative">
+                                <i class="bi bi-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                                <input type="text" id="product-search-input" placeholder="Search product name, code..." class="w-full pl-10 pr-4 py-2 text-xs rounded-xl border border-slate-200 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600">
+                            </div>
+
+                            <div>
+                                <select id="product-category-filter" class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 outline-none focus:border-blue-600">
+                                    <option value="">All Categories</option>
+                                    <!-- Dynamic -->
+                                </select>
+                            </div>
+
+                            <div>
+                                <select id="product-brand-filter" class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 outline-none focus:border-blue-600">
+                                    <option value="">All Brands</option>
+                                    <!-- Dynamic -->
+                                </select>
+                            </div>
+
+                            <div>
+                                <select id="product-stock-filter" class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 outline-none focus:border-blue-600">
+                                    <option value="">All Stock Status</option>
+                                    <option value="in_stock">In Stock Only</option>
+                                    <option value="out_of_stock">Out of Stock</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Products Table Card -->
+                    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+                        <div class="overflow-x-auto custom-scroll">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-slate-50 text-slate-500 uppercase font-extrabold text-[10px] tracking-wider border-b border-slate-200">
+                                    <tr>
+                                        <th class="py-3 px-4">Item Details</th>
+                                        <th class="py-3 px-4">Brand</th>
+                                        <th class="py-3 px-4">Category</th>
+                                        <th class="py-3 px-4">Selling Price</th>
+                                        <th class="py-3 px-4">MRP</th>
+                                        <th class="py-3 px-4">Badge</th>
+                                        <th class="py-3 px-4">Stock</th>
+                                        <th class="py-3 px-4 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="products-table-body" class="divide-y divide-slate-100 font-medium">
+                                    <!-- Rendered dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Table Footer / Stats -->
+                        <div class="p-4 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500 flex-wrap gap-2">
+                            <div>
+                                Showing <span id="table-filtered-count" class="font-bold text-slate-900">0</span> items
+                            </div>
+                            <div class="flex items-center gap-1 font-mono text-[11px]">
+                                Auto-saved to LocalStorage
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ==================================================== -->
+                <!-- 6. STORE GALLERY VIEW -->
+                <!-- ==================================================== -->
+                <section id="view-gallery" class="content-view hidden space-y-6">
+                    <div class="flex items-center justify-between flex-wrap gap-3 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+                        <div>
+                            <h2 class="text-lg font-black text-slate-900">Showroom Gallery Manager</h2>
+                            <p class="text-xs text-slate-500">Showcase physical store images with lightbox previews and WhatsApp inquiry CTAs.</p>
+                        </div>
+                        <button type="button" onclick="adminApp.openModal('gallery')" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-xl font-black text-xs sm:text-sm shadow-sm transition flex items-center gap-2 cursor-pointer">
+                            <i class="bi bi-plus-lg"></i>
+                            <span>Add Gallery Photo</span>
+                        </button>
+                    </div>
+
+                    <!-- Gallery Cards Grid -->
+                    <div id="gallery-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                        <!-- Rendered dynamically -->
+                    </div>
+                </section>
+
+                <!-- ==================================================== -->
+                <!-- 7. BACKEND BRIDGE & DATA SYNC VIEW -->
+                <!-- ==================================================== -->
+                <section id="view-sync" class="content-view hidden space-y-6">
+                    <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/80 shadow-xs space-y-3">
+                        <div class="flex items-center gap-2 text-emerald-600 font-black text-sm uppercase tracking-wider">
+                            <i class="bi bi-database-check"></i>
+                            <span>Dynamic Architecture & Backend Integration</span>
+                        </div>
+                        <h2 class="text-xl sm:text-2xl font-black text-slate-900">How this Dashboard connects to a Live Backend</h2>
+                        <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                            Currently, this panel works seamlessly with a client-side JSON store (`localStorage`), which immediately allows you to test, edit, add, and delete products, hero banners, categories, brands, and gallery photos.
+                            When you are ready to connect to a production database (PHP MySQL, Node.js Express, Python FastAPI, or Supabase/Firebase), use the schema and endpoints below.
+                        </p>
+                    </div>
+
+                    <!-- Action Buttons: Export, Import, Reset -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between">
+                            <div>
+                                <div class="text-blue-600 text-2xl mb-2"><i class="bi bi-cloud-arrow-down-fill"></i></div>
+                                <h3 class="font-black text-slate-900 text-sm mb-1">Export Data to JSON</h3>
+                                <p class="text-xs text-slate-500 mb-4">Download a full JSON backup of all 5 modules (Hero, Categories, Brands, Products, Gallery).</p>
+                            </div>
+                            <button type="button" onclick="adminApp.exportDataJSON()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2.5 rounded-xl transition flex items-center justify-center gap-2">
+                                <i class="bi bi-download"></i>
+                                <span>Download store_data.json</span>
+                            </button>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between">
+                            <div>
+                                <div class="text-emerald-600 text-2xl mb-2"><i class="bi bi-cloud-arrow-up-fill"></i></div>
+                                <h3 class="font-black text-slate-900 text-sm mb-1">Import Data from JSON</h3>
+                                <p class="text-xs text-slate-500 mb-4">Upload a JSON backup or seed file to populate the entire store catalog instantly.</p>
+                            </div>
+                            <label class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-2.5 rounded-xl transition flex items-center justify-center gap-2 cursor-pointer">
+                                <i class="bi bi-upload"></i>
+                                <span>Upload JSON File</span>
+                                <input type="file" id="import-json-input" accept=".json" class="hidden" onchange="adminApp.importDataJSON(event)">
+                            </label>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between">
+                            <div>
+                                <div class="text-red-500 text-2xl mb-2"><i class="bi bi-arrow-counterclockwise"></i></div>
+                                <h3 class="font-black text-slate-900 text-sm mb-1">Reset to Default Data</h3>
+                                <p class="text-xs text-slate-500 mb-4">Restore factory default items (all 16 products, 8 categories, 8 brands, 2 hero banners).</p>
+                            </div>
+                            <button type="button" onclick="adminApp.resetToFactoryDefaults()" class="w-full bg-slate-100 hover:bg-red-50 hover:text-red-600 text-slate-700 font-bold text-xs py-2.5 rounded-xl transition flex items-center justify-center gap-2">
+                                <i class="bi bi-trash"></i>
+                                <span>Reset Data Store</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- REST API Architecture Specification -->
+                    <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/80 shadow-xs space-y-4">
+                        <h3 class="font-black text-base text-slate-900 flex items-center gap-2">
+                            <i class="bi bi-code-square text-blue-600"></i>
+                            <span>Recommended Backend API Endpoints (Node.js / PHP / Python / Go)</span>
+                        </h3>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 text-xs font-mono">
+                            <div class="p-4 rounded-xl bg-slate-900 text-slate-200 space-y-2 overflow-x-auto">
+                                <div class="text-yellow-400 font-bold">// 1. Hero Sliders</div>
+                                <div><span class="text-emerald-400 font-bold">GET</span>    /api/sliders           <span class="text-slate-400">// Get all active slides</span></div>
+                                <div><span class="text-blue-400 font-bold">POST</span>   /api/sliders           <span class="text-slate-400">// Add new slide</span></div>
+                                <div><span class="text-amber-400 font-bold">PUT</span>    /api/sliders/:id       <span class="text-slate-400">// Update slide</span></div>
+                                <div><span class="text-red-400 font-bold">DELETE</span> /api/sliders/:id       <span class="text-slate-400">// Remove slide</span></div>
+
+                                <div class="text-yellow-400 font-bold pt-2">// 2. Categories</div>
+                                <div><span class="text-emerald-400 font-bold">GET</span>    /api/categories        <span class="text-slate-400">// List categories</span></div>
+                                <div><span class="text-blue-400 font-bold">POST</span>   /api/categories        <span class="text-slate-400">// Create category</span></div>
+                                <div><span class="text-amber-400 font-bold">PUT</span>    /api/categories/:id    <span class="text-slate-400">// Update category</span></div>
+
+                                <div class="text-yellow-400 font-bold pt-2">// 3. Brands</div>
+                                <div><span class="text-emerald-400 font-bold">GET</span>    /api/brands            <span class="text-slate-400">// List brands</span></div>
+                                <div><span class="text-blue-400 font-bold">POST</span>   /api/brands            <span class="text-slate-400">// Add brand</span></div>
+                            </div>
+
+                            <div class="p-4 rounded-xl bg-slate-900 text-slate-200 space-y-2 overflow-x-auto">
+                                <div class="text-yellow-400 font-bold">// 4. Products</div>
+                                <div><span class="text-emerald-400 font-bold">GET</span>    /api/products          <span class="text-slate-400">// Filter by brand, cat, q</span></div>
+                                <div><span class="text-blue-400 font-bold">POST</span>   /api/products          <span class="text-slate-400">// Create product</span></div>
+                                <div><span class="text-amber-400 font-bold">PUT</span>    /api/products/:id      <span class="text-slate-400">// Edit product</span></div>
+                                <div><span class="text-red-400 font-bold">DELETE</span> /api/products/:id      <span class="text-slate-400">// Delete product</span></div>
+
+                                <div class="text-yellow-400 font-bold pt-2">// 5. Gallery & Inquiries</div>
+                                <div><span class="text-emerald-400 font-bold">GET</span>    /api/gallery           <span class="text-slate-400">// Get showroom photos</span></div>
+                                <div><span class="text-blue-400 font-bold">POST</span>   /api/gallery           <span class="text-slate-400">// Upload photo</span></div>
+                                <div><span class="text-emerald-400 font-bold">GET</span>    /api/orders            <span class="text-slate-400">// Quotation records</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- ==================================================== -->
+    <!-- MODAL: ADD / EDIT PRODUCT -->
+    <!-- ==================================================== -->
+    <div id="modal-product" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-950/70 backdrop-blur-xs hidden">
+        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div class="p-4 sm:p-5 border-b border-slate-200 flex items-center justify-between">
+                <div>
+                    <h3 id="modal-product-title" class="font-black text-slate-900 text-base">Add New Product</h3>
+                    <p class="text-xs text-slate-500">Configure catalog details, pricing, and image.</p>
+                </div>
+                <button type="button" onclick="adminApp.closeModal('product')" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center">
+                    <i class="bi bi-x-lg text-sm"></i>
+                </button>
+            </div>
+
+            <form id="form-product" onsubmit="adminApp.saveProduct(event)" class="p-5 overflow-y-auto space-y-4 custom-scroll text-xs">
+                <input type="hidden" id="prod-id">
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="sm:col-span-2">
+                        <label class="block font-bold text-slate-700 mb-1">Product Title *</label>
+                        <input type="text" id="prod-title" required placeholder="e.g. Havells 9W Cool Day Light LED Bulb (Pack of 2)" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 outline-none focus:border-blue-600">
+                    </div>
+
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Brand *</label>
+                        <select id="prod-brand" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 outline-none focus:border-blue-600">
+                            <!-- Dynamic -->
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Category *</label>
+                        <select id="prod-category" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 outline-none focus:border-blue-600">
+                            <!-- Dynamic -->
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Selling / Offer Price (₹) *</label>
+                        <input type="number" id="prod-price" required step="1" min="0" placeholder="120" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 outline-none focus:border-blue-600">
+                    </div>
+
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">MRP / Regular Price (₹) *</label>
+                        <input type="number" id="prod-mrp" required step="1" min="0" placeholder="190" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 outline-none focus:border-blue-600">
+                    </div>
+
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Highlight Badge</label>
+                        <select id="prod-badge" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 outline-none focus:border-blue-600">
+                            <option value="">None</option>
+                            <option value="BESTSELLER">BESTSELLER (Red)</option>
+                            <option value="TOP RATED">TOP RATED (Orange)</option>
+                            <option value="HIGH AIR">HIGH AIR (Red)</option>
+                            <option value="FLAME RETARDANT">FLAME RETARDANT (Blue)</option>
+                            <option value="HOT SELLER">HOT SELLER (Pink)</option>
+                            <option value="FACTORY PRICE">FACTORY PRICE (Green)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Stock Status</label>
+                        <select id="prod-stock" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 outline-none focus:border-blue-600">
+                            <option value="in_stock">In Stock (Green)</option>
+                            <option value="low_stock">Low Stock (Yellow)</option>
+                            <option value="out_of_stock">Out of Stock (Red)</option>
+                        </select>
+                    </div>
+
+                    <div class="sm:col-span-2">
+                        <label class="block font-bold text-slate-700 mb-1">Product Image URL or Path *</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="prod-image" required placeholder="assets/images/products/... or https://..." class="flex-1 px-3.5 py-2.5 rounded-xl border border-slate-200 outline-none focus:border-blue-600">
+                            <label class="px-3 py-2.5 bg-slate-100 hover:bg-slate-200 rounded-xl cursor-pointer font-bold text-slate-700 flex items-center gap-1.5 shrink-0">
+                                <i class="bi bi-upload"></i>
+                                <span>Upload</span>
+                                <input type="file" accept="image/*" class="hidden" onchange="adminApp.handleImageUpload(event, 'prod-image', 'prod-preview')">
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Image Preview -->
+                    <div class="sm:col-span-2">
+                        <div class="w-24 h-24 rounded-xl border border-slate-200 overflow-hidden bg-slate-50 flex items-center justify-center">
+                            <img id="prod-preview" src="assets/images/category-placeholder.jpg" alt="Preview" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-slate-200 flex items-center justify-end gap-2.5">
+                    <button type="button" onclick="adminApp.closeModal('product')" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black shadow-md transition">
+                        Save Product
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==================================================== -->
+    <!-- MODAL: ADD / EDIT HERO SLIDE -->
+    <!-- ==================================================== -->
+    <div id="modal-hero" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-950/70 backdrop-blur-xs hidden">
+        <div class="bg-white rounded-2xl max-w-xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div class="p-4 sm:p-5 border-b border-slate-200 flex items-center justify-between">
+                <div>
+                    <h3 id="modal-hero-title" class="font-black text-slate-900 text-base">Add New Hero Slide</h3>
+                    <p class="text-xs text-slate-500">Configure promotional desktop and mobile banners.</p>
+                </div>
+                <button type="button" onclick="adminApp.closeModal('hero')" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center">
+                    <i class="bi bi-x-lg text-sm"></i>
+                </button>
+            </div>
+
+            <form id="form-hero" onsubmit="adminApp.saveHero(event)" class="p-5 overflow-y-auto space-y-4 custom-scroll text-xs">
+                <input type="hidden" id="hero-id">
+
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Slide Title / Alt Text *</label>
+                    <input type="text" id="hero-title" required placeholder="e.g. Exclusive Deals on Havells & Polycab" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 outline-none focus:border-blue-600">
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Desktop Banner Image URL / Path *</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="hero-desktop" required placeholder="assets/images/banners/..." class="flex-1 px-3.5 py-2.5 rounded-xl border border-slate-200 outline-none focus:border-blue-600">
+                        <label class="px-3 py-2.5 bg-slate-100 hover:bg-slate-200 rounded-xl cursor-pointer font-bold text-slate-700 flex items-center gap-1.5 shrink-0">
+                            <i class="bi bi-upload"></i>
+                            <input type="file" accept="image/*" class="hidden" onchange="adminApp.handleImageUpload(event, 'hero-desktop', 'hero-preview')">
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Mobile Banner Image URL / Path *</label>
+                    <input type="text" id="hero-mobile" required placeholder="assets/images/banners/..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 outline-none focus:border-blue-600">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Target Link URL</label>
+                        <input type="text" id="hero-link" value="#products" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 outline-none focus:border-blue-600">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Sort Order</label>
+                        <input type="number" id="hero-order" value="1" min="1" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 outline-none focus:border-blue-600">
+                    </div>
+                </div>
+
+                <!-- Preview -->
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Banner Preview</label>
+                    <div class="aspect-[16/6] rounded-xl border border-slate-200 overflow-hidden bg-slate-900">
+                        <img id="hero-preview" src="assets/images/banners/01M2DATJWCE0W85RAQES221FXK.webp" alt="Preview" class="w-full h-full object-cover">
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-slate-200 flex items-center justify-end gap-2.5">
+                    <button type="button" onclick="adminApp.closeModal('hero')" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-yellow-400 hover:bg-yellow-500 text-black font-black shadow-md transition">
+                        Save Slide
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==================================================== -->
+    <!-- MODAL: ADD / EDIT CATEGORY -->
+    <!-- ==================================================== -->
+    <div id="modal-category" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-950/70 backdrop-blur-xs hidden">
+        <div class="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div class="p-4 sm:p-5 border-b border-slate-200 flex items-center justify-between">
+                <div>
+                    <h3 id="modal-category-title" class="font-black text-slate-900 text-base">Add New Category</h3>
+                    <p class="text-xs text-slate-500">Configure category card name, image, and slug.</p>
+                </div>
+                <button type="button" onclick="adminApp.closeModal('category')" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center">
+                    <i class="bi bi-x-lg text-sm"></i>
+                </button>
+            </div>
+
+            <form id="form-category" onsubmit="adminApp.saveCategory(event)" class="p-5 overflow-y-auto space-y-4 custom-scroll text-xs">
+                <input type="hidden" id="cat-id">
+
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Category Name *</label>
+                    <input type="text" id="cat-name" required placeholder="e.g. LED Lighting" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 outline-none focus:border-blue-600">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Category Slug *</label>
+                        <input type="text" id="cat-slug" required placeholder="cat-lighting" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 outline-none focus:border-blue-600">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Subtext / Item Count</label>
+                        <input type="text" id="cat-count" placeholder="Explore 25+ Items" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 outline-none focus:border-blue-600">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Category Image Path / URL *</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="cat-image" required placeholder="assets/images/categories/..." class="flex-1 px-3.5 py-2.5 rounded-xl border border-slate-200 outline-none focus:border-blue-600">
+                        <label class="px-3 py-2.5 bg-slate-100 hover:bg-slate-200 rounded-xl cursor-pointer font-bold text-slate-700 flex items-center gap-1.5 shrink-0">
+                            <i class="bi bi-upload"></i>
+                            <input type="file" accept="image/*" class="hidden" onchange="adminApp.handleImageUpload(event, 'cat-image', 'cat-preview')">
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="w-20 h-20 rounded-xl border border-slate-200 overflow-hidden bg-slate-900">
+                        <img id="cat-preview" src="assets/images/categories/01M2DDZ2M55W08YSDHWMFH1QBY.webp" alt="Preview" class="w-full h-full object-cover">
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-slate-200 flex items-center justify-end gap-2.5">
+                    <button type="button" onclick="adminApp.closeModal('category')" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-black shadow-md transition">
+                        Save Category
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==================================================== -->
+    <!-- MODAL: ADD / EDIT BRAND -->
+    <!-- ==================================================== -->
+    <div id="modal-brand" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-950/70 backdrop-blur-xs hidden">
+        <div class="bg-white rounded-2xl max-w-md w-full flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div class="p-4 sm:p-5 border-b border-slate-200 flex items-center justify-between">
+                <div>
+                    <h3 id="modal-brand-title" class="font-black text-slate-900 text-base">Add New Brand</h3>
+                    <p class="text-xs text-slate-500">Add brand slug for filter tabs and brand carousel.</p>
+                </div>
+                <button type="button" onclick="adminApp.closeModal('brand')" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center">
+                    <i class="bi bi-x-lg text-sm"></i>
+                </button>
+            </div>
+
+            <form id="form-brand" onsubmit="adminApp.saveBrand(event)" class="p-5 space-y-4 text-xs">
+                <input type="hidden" id="brand-id">
+
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Brand Name *</label>
+                    <input type="text" id="brand-name" required placeholder="e.g. Havells" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 outline-none focus:border-blue-600">
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Brand Slug (Tab Filter ID) *</label>
+                    <input type="text" id="brand-slug" required placeholder="e.g. havells (lowercase, no spaces)" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 outline-none focus:border-blue-600">
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Brand Logo Image (Optional)</label>
+                    <input type="text" id="brand-image" placeholder="assets/images/brands/... (Leave blank for text logo)" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 outline-none focus:border-blue-600">
+                </div>
+
+                <div class="pt-4 border-t border-slate-200 flex items-center justify-end gap-2.5">
+                    <button type="button" onclick="adminApp.closeModal('brand')" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-700 text-white font-black shadow-md transition">
+                        Save Brand
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==================================================== -->
+    <!-- MODAL: ADD / EDIT GALLERY PHOTO -->
+    <!-- ==================================================== -->
+    <div id="modal-gallery" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-950/70 backdrop-blur-xs hidden">
+        <div class="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div class="p-4 sm:p-5 border-b border-slate-200 flex items-center justify-between">
+                <div>
+                    <h3 id="modal-gallery-title" class="font-black text-slate-900 text-base">Add Gallery Photo</h3>
+                    <p class="text-xs text-slate-500">Add showroom pictures for store lightbox carousel.</p>
+                </div>
+                <button type="button" onclick="adminApp.closeModal('gallery')" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center">
+                    <i class="bi bi-x-lg text-sm"></i>
+                </button>
+            </div>
+
+            <form id="form-gallery" onsubmit="adminApp.saveGallery(event)" class="p-5 overflow-y-auto space-y-4 custom-scroll text-xs">
+                <input type="hidden" id="gal-id">
+
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Photo Title *</label>
+                    <input type="text" id="gal-title" required placeholder="e.g. Modern LED Showroom & Chandeliers" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 outline-none focus:border-blue-600">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Tag / Category *</label>
+                        <input type="text" id="gal-tag" required placeholder="LED Lighting" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 outline-none focus:border-blue-600">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Subtitle</label>
+                        <input type="text" id="gal-desc" placeholder="Lucknow Showroom Display" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 outline-none focus:border-blue-600">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Image Path / URL *</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="gal-image" required placeholder="assets/images/store_gallery/..." class="flex-1 px-3.5 py-2.5 rounded-xl border border-slate-200 outline-none focus:border-blue-600">
+                        <label class="px-3 py-2.5 bg-slate-100 hover:bg-slate-200 rounded-xl cursor-pointer font-bold text-slate-700 flex items-center gap-1.5 shrink-0">
+                            <i class="bi bi-upload"></i>
+                            <input type="file" accept="image/*" class="hidden" onchange="adminApp.handleImageUpload(event, 'gal-image', 'gal-preview')">
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="aspect-[16/7] rounded-xl border border-slate-200 overflow-hidden bg-slate-900">
+                        <img id="gal-preview" src="assets/images/store_gallery/01M2FVTW9JA063B748QQG10K5G.webp" alt="Preview" class="w-full h-full object-cover">
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-slate-200 flex items-center justify-end gap-2.5">
+                    <button type="button" onclick="adminApp.closeModal('gallery')" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-black shadow-md transition">
+                        Save Gallery Item
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==================================================== -->
+    <!-- FLOATING TOAST NOTIFICATION CONTAINER -->
+    <!-- ==================================================== -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- Admin Logic -->
+    <script src="js/admin.js"></script>
+</body>
+</html>
