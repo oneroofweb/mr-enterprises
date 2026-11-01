@@ -568,6 +568,10 @@ class AdminApp {
         document.getElementById('hero-link').value = slide.link || '#products';
         document.getElementById('hero-order').value = slide.order || 1;
         document.getElementById('hero-preview').src = slide.desktop;
+        const mobPreview = document.getElementById('hero-mobile-preview');
+        if (mobPreview && slide.mobile) {
+            mobPreview.src = slide.mobile;
+        }
         document.getElementById('modal-hero-title').textContent = 'Edit Hero Slide';
         this.openModal('hero');
     }
@@ -751,6 +755,10 @@ class AdminApp {
         document.getElementById('brand-name').value = brand.name;
         document.getElementById('brand-slug').value = brand.slug;
         document.getElementById('brand-image').value = brand.image || '';
+        const brandPreview = document.getElementById('brand-preview');
+        if (brandPreview) {
+            brandPreview.src = brand.image || 'assets/images/brands/01M2F41CSD7QBZNXRSGZXFGX07.webp';
+        }
         document.getElementById('modal-brand-title').textContent = 'Edit Brand';
         this.openModal('brand');
     }
@@ -1062,10 +1070,35 @@ class AdminApp {
         if (!modal) return;
         modal.classList.remove('hidden');
 
-        // If opening empty add modal, reset form
+        // If opening empty add modal, reset form and image previews
         const form = document.getElementById(`form-${modalKey}`);
         if (form && !form.querySelector('input[type="hidden"]')?.value) {
             form.reset();
+            const previews = {
+                hero: () => {
+                    const hp = document.getElementById('hero-preview');
+                    const hmp = document.getElementById('hero-mobile-preview');
+                    if (hp) hp.src = 'assets/images/banners/01M2DATJWCE0W85RAQES221FXK.webp';
+                    if (hmp) hmp.src = 'assets/images/banners/01M2DATJWNHQB2RS6B86DJSQWZ.webp';
+                },
+                category: () => {
+                    const cp = document.getElementById('cat-preview');
+                    if (cp) cp.src = 'assets/images/categories/01M2DDZ2M55W08YSDHWMFH1QBY.webp';
+                },
+                brand: () => {
+                    const bp = document.getElementById('brand-preview');
+                    if (bp) bp.src = 'assets/images/brands/01M2F41CSD7QBZNXRSGZXFGX07.webp';
+                },
+                product: () => {
+                    const pp = document.getElementById('prod-preview');
+                    if (pp) pp.src = 'assets/images/category-placeholder.jpg';
+                },
+                gallery: () => {
+                    const gp = document.getElementById('gal-preview');
+                    if (gp) gp.src = 'assets/images/store_gallery/01M2FVTW9JA063B748QQG10K5G.webp';
+                }
+            };
+            if (previews[modalKey]) previews[modalKey]();
         }
     }
 
@@ -1080,8 +1113,18 @@ class AdminApp {
     }
 
     handleImageUpload(e, inputTargetId, previewImgId) {
-        const file = e.target.files[0];
+        const file = e.target.files ? e.target.files[0] : (e.dataTransfer ? e.dataTransfer.files[0] : null);
         if (!file) return;
+
+        if (!file.type.startsWith('image/')) {
+            this.showToast('Please select a valid image file (PNG, JPG, WebP, SVG)', 'error');
+            return;
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+            this.showToast('Image size exceeds 5MB. Please choose a smaller image.', 'error');
+            return;
+        }
 
         const reader = new FileReader();
         reader.onload = (loadEvent) => {
@@ -1090,7 +1133,7 @@ class AdminApp {
             const preview = document.getElementById(previewImgId);
             if (input) input.value = dataUrl;
             if (preview) preview.src = dataUrl;
-            this.showToast('Image uploaded and preview ready!', 'info');
+            this.showToast(`Uploaded: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`, 'success');
         };
         reader.readAsDataURL(file);
     }

@@ -780,9 +780,9 @@
                         <label class="block font-bold text-slate-700 mb-1">Product Image URL or Path *</label>
                         <div class="flex gap-2">
                             <input type="text" id="prod-image" required placeholder="assets/images/products/... or https://..." class="flex-1 px-3.5 py-2.5 rounded-xl border border-slate-200 outline-none focus:border-blue-600">
-                            <label class="px-3 py-2.5 bg-slate-100 hover:bg-slate-200 rounded-xl cursor-pointer font-bold text-slate-700 flex items-center gap-1.5 shrink-0">
-                                <i class="bi bi-upload"></i>
-                                <span>Upload</span>
+                            <label class="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 rounded-xl cursor-pointer font-bold text-slate-700 flex items-center gap-1.5 shrink-0 transition active:scale-95 shadow-xs">
+                                <i class="bi bi-upload text-blue-600"></i>
+                                <span>Upload Photo</span>
                                 <input type="file" accept="image/*" class="hidden" onchange="adminApp.handleImageUpload(event, 'prod-image', 'prod-preview')">
                             </label>
                         </div>
@@ -835,8 +835,9 @@
                     <label class="block font-bold text-slate-700 mb-1">Desktop Banner Image URL / Path *</label>
                     <div class="flex gap-2">
                         <input type="text" id="hero-desktop" required placeholder="assets/images/banners/..." class="flex-1 px-3.5 py-2.5 rounded-xl border border-slate-200 outline-none focus:border-blue-600">
-                        <label class="px-3 py-2.5 bg-slate-100 hover:bg-slate-200 rounded-xl cursor-pointer font-bold text-slate-700 flex items-center gap-1.5 shrink-0">
-                            <i class="bi bi-upload"></i>
+                        <label class="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 rounded-xl cursor-pointer font-bold text-slate-700 flex items-center gap-1.5 shrink-0 transition active:scale-95 shadow-xs">
+                            <i class="bi bi-upload text-blue-600"></i>
+                            <span>Upload Desktop</span>
                             <input type="file" accept="image/*" class="hidden" onchange="adminApp.handleImageUpload(event, 'hero-desktop', 'hero-preview')">
                         </label>
                     </div>
@@ -844,7 +845,14 @@
 
                 <div>
                     <label class="block font-bold text-slate-700 mb-1">Mobile Banner Image URL / Path *</label>
-                    <input type="text" id="hero-mobile" required placeholder="assets/images/banners/..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 outline-none focus:border-blue-600">
+                    <div class="flex gap-2">
+                        <input type="text" id="hero-mobile" required placeholder="assets/images/banners/..." class="flex-1 px-3.5 py-2.5 rounded-xl border border-slate-200 outline-none focus:border-blue-600">
+                        <label class="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 rounded-xl cursor-pointer font-bold text-slate-700 flex items-center gap-1.5 shrink-0 transition active:scale-95 shadow-xs">
+                            <i class="bi bi-upload text-blue-600"></i>
+                            <span>Upload Mobile</span>
+                            <input type="file" accept="image/*" class="hidden" onchange="adminApp.handleImageUpload(event, 'hero-mobile', 'hero-mobile-preview')">
+                        </label>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">
@@ -858,11 +866,19 @@
                     </div>
                 </div>
 
-                <!-- Preview -->
-                <div>
-                    <label class="block font-bold text-slate-700 mb-1">Banner Preview</label>
-                    <div class="aspect-[16/6] rounded-xl border border-slate-200 overflow-hidden bg-slate-900">
-                        <img id="hero-preview" src="assets/images/banners/01M2DATJWCE0W85RAQES221FXK.webp" alt="Preview" class="w-full h-full object-cover">
+                <!-- Previews (Desktop & Mobile) -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Desktop Preview (16:6)</label>
+                        <div class="aspect-[16/6] rounded-xl border border-slate-200 overflow-hidden bg-slate-900">
+                            <img id="hero-preview" src="assets/images/banners/01M2DATJWCE0W85RAQES221FXK.webp" alt="Desktop Preview" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Mobile Preview (5:3)</label>
+                        <div class="aspect-[5/3] rounded-xl border border-slate-200 overflow-hidden bg-slate-900">
+                            <img id="hero-mobile-preview" src="assets/images/banners/01M2DATJWNHQB2RS6B86DJSQWZ.webp" alt="Mobile Preview" class="w-full h-full object-cover">
+                        </div>
                     </div>
                 </div>
 
@@ -916,15 +932,17 @@
                     <label class="block font-bold text-slate-700 mb-1">Category Image Path / URL *</label>
                     <div class="flex gap-2">
                         <input type="text" id="cat-image" required placeholder="assets/images/categories/..." class="flex-1 px-3.5 py-2.5 rounded-xl border border-slate-200 outline-none focus:border-blue-600">
-                        <label class="px-3 py-2.5 bg-slate-100 hover:bg-slate-200 rounded-xl cursor-pointer font-bold text-slate-700 flex items-center gap-1.5 shrink-0">
-                            <i class="bi bi-upload"></i>
+                        <label class="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 rounded-xl cursor-pointer font-bold text-slate-700 flex items-center gap-1.5 shrink-0 transition active:scale-95 shadow-xs">
+                            <i class="bi bi-upload text-amber-500"></i>
+                            <span>Upload Image</span>
                             <input type="file" accept="image/*" class="hidden" onchange="adminApp.handleImageUpload(event, 'cat-image', 'cat-preview')">
                         </label>
                     </div>
                 </div>
 
                 <div>
-                    <div class="w-20 h-20 rounded-xl border border-slate-200 overflow-hidden bg-slate-900">
+                    <label class="block font-bold text-slate-700 mb-1">Image Preview</label>
+                    <div class="w-24 h-24 rounded-xl border border-slate-200 overflow-hidden bg-slate-900">
                         <img id="cat-preview" src="assets/images/categories/01M2DDZ2M55W08YSDHWMFH1QBY.webp" alt="Preview" class="w-full h-full object-cover">
                     </div>
                 </div>
@@ -970,8 +988,22 @@
                 </div>
 
                 <div>
-                    <label class="block font-bold text-slate-700 mb-1">Brand Logo Image (Optional)</label>
-                    <input type="text" id="brand-image" placeholder="assets/images/brands/... (Leave blank for text logo)" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 outline-none focus:border-blue-600">
+                    <label class="block font-bold text-slate-700 mb-1">Brand Logo Image</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="brand-image" placeholder="assets/images/brands/... or upload logo" class="flex-1 px-3.5 py-2.5 rounded-xl border border-slate-200 outline-none focus:border-blue-600">
+                        <label class="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 rounded-xl cursor-pointer font-bold text-slate-700 flex items-center gap-1.5 shrink-0 transition active:scale-95 shadow-xs">
+                            <i class="bi bi-upload text-cyan-600"></i>
+                            <span>Upload Logo</span>
+                            <input type="file" accept="image/*" class="hidden" onchange="adminApp.handleImageUpload(event, 'brand-image', 'brand-preview')">
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Logo Preview</label>
+                    <div class="h-16 w-36 rounded-xl border border-slate-200 overflow-hidden bg-slate-50 flex items-center justify-center p-2">
+                        <img id="brand-preview" src="assets/images/brands/01M2F41CSD7QBZNXRSGZXFGX07.webp" alt="Logo Preview" class="max-h-full max-w-full object-contain">
+                    </div>
                 </div>
 
                 <div class="pt-4 border-t border-slate-200 flex items-center justify-end gap-2.5">
@@ -1024,8 +1056,9 @@
                     <label class="block font-bold text-slate-700 mb-1">Image Path / URL *</label>
                     <div class="flex gap-2">
                         <input type="text" id="gal-image" required placeholder="assets/images/store_gallery/..." class="flex-1 px-3.5 py-2.5 rounded-xl border border-slate-200 outline-none focus:border-blue-600">
-                        <label class="px-3 py-2.5 bg-slate-100 hover:bg-slate-200 rounded-xl cursor-pointer font-bold text-slate-700 flex items-center gap-1.5 shrink-0">
-                            <i class="bi bi-upload"></i>
+                        <label class="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 rounded-xl cursor-pointer font-bold text-slate-700 flex items-center gap-1.5 shrink-0 transition active:scale-95 shadow-xs">
+                            <i class="bi bi-upload text-purple-600"></i>
+                            <span>Upload Photo</span>
                             <input type="file" accept="image/*" class="hidden" onchange="adminApp.handleImageUpload(event, 'gal-image', 'gal-preview')">
                         </label>
                     </div>

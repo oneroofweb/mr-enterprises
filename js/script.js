@@ -1182,14 +1182,47 @@ _Maine upar diye gaye sabhi products ka ek sath combined payment UPI se transfer
         const form = document.getElementById('quick-inquiry-form');
         if (!form) return;
 
+        const fileInput = document.getElementById('inquiry-slip-input');
+        const fileText = document.getElementById('inquiry-file-text');
+        const previewContainer = document.getElementById('inquiry-slip-preview-container');
+        const previewImg = document.getElementById('inquiry-slip-preview');
+        const removeBtn = document.getElementById('inquiry-slip-remove-btn');
+        let attachedFileName = null;
+
+        if (fileInput) {
+            fileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                attachedFileName = file.name;
+                if (fileText) fileText.textContent = `✓ ${file.name}`;
+                const reader = new FileReader();
+                reader.onload = (loadEvt) => {
+                    if (previewImg) previewImg.src = loadEvt.target.result;
+                    if (previewContainer) previewContainer.classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        if (removeBtn) {
+            removeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                attachedFileName = null;
+                if (fileInput) fileInput.value = '';
+                if (fileText) fileText.textContent = 'Tap to upload or take photo of list';
+                if (previewContainer) previewContainer.classList.add('hidden');
+            });
+        }
+
         form.addEventListener('submit', (e) => {
             e.preventDefault();
             const name = form.querySelector('[name="customer_name"]')?.value || 'Customer';
             const category = form.querySelector('[name="category"]')?.value || 'Electrical Goods';
             const requirement = form.querySelector('[name="requirement"]')?.value || '';
+            const slipNote = attachedFileName ? `\n*Handwritten Slip/Photo:* Attached (${attachedFileName}) - I will send the picture in this chat` : '';
 
             const phone = "919648505055";
-            const message = `Hello MR Enterprises,\n\nI need a price quotation / bulk order inquiry:\n*Name:* ${name}\n*Requirement Category:* ${category}\n*Details / List:*\n${requirement}\n\nPlease share your best rates.`;
+            const message = `Hello MR Enterprises,\n\nI need a price quotation / bulk order inquiry:\n*Name:* ${name}\n*Requirement Category:* ${category}\n*Details / List:*\n${requirement}${slipNote}\n\nPlease share your best rates.`;
 
             window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
         });
